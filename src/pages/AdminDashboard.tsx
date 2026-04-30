@@ -13,7 +13,8 @@ import { useApp } from '../context/AppContext';
 export default function AdminDashboard({ id }: { id?: string }) {
   const { user, profile, loading, isSuperAdmin, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const { t } = useApp();
+  const { t, theme } = useApp();
+  const isDark = theme === 'dark';
   const [stats, setStats] = useState({ apartments: 0, bookings: 0 });
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -107,122 +108,111 @@ export default function AdminDashboard({ id }: { id?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="mx-auto max-w-7xl px-4 pt-32 pb-12 sm:px-6 lg:px-8"
+      className={`mx-auto max-w-7xl px-8 pt-48 pb-24 transition-colors duration-500`}
     >
-      <header className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+      <header className="mb-20 flex flex-col items-start justify-between gap-12 md:flex-row md:items-end">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900 font-display flex items-center gap-2">
-            <LayoutDashboard className="h-6 w-6 text-blue-600" />
-            {t('admin.dashboard_title')}
-          </h1>
-          <p className="mt-1 text-sm text-neutral-500 font-medium">
-            Welcome back, {user?.displayName || 'Admin'} 
-            <span className="ml-2 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold uppercase text-neutral-500">
+          <span className="premium-label tracking-[0.4em] mb-4 block">Executive Portal</span>
+          <h1 className={`text-4xl italic font-serif tracking-tight lg:text-6xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('admin.dashboard_title')}</h1>
+          <p className="mt-4 text-neutral-500 font-light tracking-wide">
+            Welcome, {user?.displayName || 'Administrator'} 
+            <span className="ml-4 premium-label !text-[8px] !opacity-40">
               {profile?.role.replace('_', ' ')}
             </span>
           </p>
         </div>
         {isSuperAdmin && (
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <button 
               onClick={generateDemoData}
               disabled={isGenerating}
-              className="flex items-center gap-2 rounded-xl bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-600 hover:bg-blue-100 disabled:opacity-50 transition-colors"
+              className="luxury-button"
             >
-              <Play className="h-4 w-4" />
-              {isGenerating ? t('booking.processing') : 'Generate Demo Data'}
+              <Play className="h-3 w-3" />
+              {isGenerating ? t('booking.processing') : 'Seed Portfolio'}
             </button>
             <button 
               onClick={clearAllData}
-              className="flex items-center gap-2 rounded-xl bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-100 transition-colors"
+              className="luxury-button border-red-100 text-red-600 hover:bg-red-600 hover:text-white"
             >
-              <Trash2 className="h-4 w-4" />
-              {t('common.delete')} All
+              <Trash2 className="h-3 w-3" />
+              Purge All
             </button>
           </div>
         )}
       </header>
 
       {/* Secondary Navbar */}
-      <div className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-neutral-200 pb-4">
-        <div className="flex flex-wrap items-center gap-1 sm:gap-6">
+      <div className="mb-16 flex flex-wrap items-center justify-between gap-8 border-b border-neutral-100 pb-8">
+        <div className="flex flex-wrap items-center gap-10">
           {[
-            { icon: <CheckCircle className="h-4 w-4" />, label: "Check-in/out", active: true },
-            { icon: <Calendar className="h-4 w-4" />, label: "Calendar", to: "#" },
-            { icon: <CalendarCheck className="h-4 w-4" />, label: t('nav.bookings'), to: "/admin/bookings" },
-            { icon: <Hotel className="h-4 w-4" />, label: t('common.apartment'), to: "/admin/apartments" },
-            isSuperAdmin ? { icon: <Users className="h-4 w-4" />, label: "User Access", to: "/admin/users" } : null,
-            { icon: <MessageSquare className="h-4 w-4" />, label: "Messages", to: "#" },
-            { icon: <Wallet className="h-4 w-4" />, label: "Expenses", to: "#" },
+            { icon: <LayoutDashboard className="h-3.5 w-3.5" />, label: "Overview", active: true },
+            { icon: <CalendarCheck className="h-3.5 w-3.5" />, label: t('nav.bookings'), to: "/admin/bookings" },
+            { icon: <Hotel className="h-3.5 w-3.5" />, label: t('common.apartment'), to: "/admin/apartments" },
+            isSuperAdmin ? { icon: <Users className="h-3.5 w-3.5" />, label: "User Access", to: "/admin/users" } : null,
           ].map((item, i) => item && (
             <Link 
               key={i}
               to={item.to || '#'}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors hover:text-blue-600 ${item.active ? 'text-blue-600 border-b-2 border-blue-600' : 'text-neutral-500'}`}
+              className={`premium-label hover:text-gold-600 transition-colors relative group ${item.active ? 'text-gold-600' : 'text-neutral-400'}`}
             >
-              {item.icon}
-              <span className="hidden sm:inline">{item.label}</span>
+              <div className="flex items-center gap-3">
+                {item.icon}
+                {item.label}
+              </div>
+              {item.active && <span className="absolute -bottom-8 left-0 h-[2px] w-full bg-gold-600" />}
             </Link>
           ))}
-        </div>
-        <div className="flex items-center gap-4 text-xs font-medium text-neutral-400">
-          <button className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-neutral-600 hover:bg-neutral-50">
-            <RefreshCw className="h-3.5 w-3.5" />
-            Refresh
-          </button>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-20 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { icon: <Hotel className="h-6 w-6 text-blue-600" />, label: "Total Apartments", value: stats.apartments, trend: "+2 this month" },
-          { icon: <CalendarCheck className="h-6 w-6 text-emerald-600" />, label: "Active Bookings", value: stats.bookings, trend: "+15% from last week" },
-          { icon: <TrendingUp className="h-6 w-6 text-purple-600" />, label: "Revenue Est.", value: `$${stats.bookings * 150}`, trend: "Growing" },
-          { icon: <Users className="h-6 w-6 text-orange-600" />, label: "Visitors", value: "1.2k", trend: "Normal" },
+          { label: "Residences", value: stats.apartments, trend: "Stable" },
+          { label: "Bookings", value: stats.bookings, trend: "Growth" },
+          { label: "Revenue", value: `$${stats.bookings * 150}`, trend: "Projected" },
+          { label: "Audience", value: "1.2k", trend: "Active" },
         ].map((stat, i) => (
-          <div key={i} className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="rounded-2xl bg-neutral-50 p-3">{stat.icon}</div>
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">{stat.trend}</span>
-            </div>
-            <div className="text-sm font-medium text-neutral-500">{stat.label}</div>
-            <div className="text-3xl font-extrabold text-neutral-900">{stat.value}</div>
+          <div key={i} className="bento-card p-10">
+            <div className="premium-label !opacity-40 mb-6">{stat.label}</div>
+            <div className="text-5xl italic font-serif text-neutral-900 mb-4">{stat.value}</div>
+            <div className="premium-label !text-[8px] text-emerald-600">{stat.trend}</div>
           </div>
         ))}
       </div>
 
       {/* Navigation Cards */}
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-12 md:grid-cols-2">
         <Link 
           to="/admin/apartments" 
-          className="group flex flex-col justify-between rounded-3xl border border-neutral-200 bg-white p-8 transition-all hover:border-blue-500 hover:shadow-xl"
+          className="bento-card group p-12 hover:bg-gold-50"
         >
-          <div>
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-100 transition-transform group-hover:scale-110">
-              <Hotel className="h-8 w-8" />
+          <div className="flex flex-col h-full justify-between">
+            <div>
+              <Hotel className="h-8 w-8 text-gold-600 mb-10 transition-transform group-hover:scale-110" />
+              <h2 className="text-3xl italic font-serif text-neutral-900 mb-4">{t('admin.manage_apartments')}</h2>
+              <p className="text-neutral-500 font-light tracking-wide">{t('admin.manage_apts_sub')}</p>
             </div>
-            <h2 className="mb-3 text-2xl font-bold text-neutral-900">{t('admin.manage_apartments')}</h2>
-            <p className="text-neutral-600 leading-relaxed">{t('admin.manage_apts_sub')}</p>
-          </div>
-          <div className="mt-8 flex items-center gap-2 font-bold text-blue-600">
-            {t('common.view')} <Plus className="h-5 w-5" />
+            <div className="mt-12">
+              <span className="luxury-button group-hover:bg-neutral-900 group-hover:text-white">Enter collection</span>
+            </div>
           </div>
         </Link>
 
         <Link 
           to="/admin/bookings" 
-          className="group flex flex-col justify-between rounded-3xl border border-neutral-200 bg-white p-8 transition-all hover:border-emerald-500 hover:shadow-xl"
+          className="bento-card group p-12 hover:bg-gold-50"
         >
-          <div>
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-100 transition-transform group-hover:scale-110">
-              <CalendarCheck className="h-8 w-8" />
+          <div className="flex flex-col h-full justify-between">
+            <div>
+              <CalendarCheck className="h-8 w-8 text-gold-600 mb-10 transition-transform group-hover:scale-110" />
+              <h2 className="text-3xl italic font-serif text-neutral-900 mb-4">{t('admin.review_bookings')}</h2>
+              <p className="text-neutral-500 font-light tracking-wide">{t('admin.review_bookings_sub')}</p>
             </div>
-            <h2 className="mb-3 text-2xl font-bold text-neutral-900">{t('admin.review_bookings')}</h2>
-            <p className="text-neutral-600 leading-relaxed">{t('admin.review_bookings_sub')}</p>
-          </div>
-          <div className="mt-8 flex items-center gap-2 font-bold text-emerald-600">
-            {t('common.view')} <Plus className="h-5 w-5" />
+            <div className="mt-12">
+              <span className="luxury-button group-hover:bg-neutral-900 group-hover:text-white">Review requests</span>
+            </div>
           </div>
         </Link>
       </div>

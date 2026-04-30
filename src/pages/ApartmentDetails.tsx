@@ -28,7 +28,20 @@ export default function ApartmentDetails({ id }: { id?: string }) {
     guestPhone: '',
     startDate: '',
     endDate: '',
+    paymentMethod: 'card',
   });
+
+  const calculatePrice = () => {
+    if (!apartment || !formData.startDate || !formData.endDate) return { subtotal: 0, tax: 0, total: 0, days: 0 };
+    const start = new Date(formData.startDate);
+    const end = new Date(formData.endDate);
+    const days = Math.max(0, differenceInDays(end, start));
+    const subtotal = days * apartment.pricePerNight;
+    const tax = subtotal * 0.1; // 10% tax/service fee
+    return { subtotal, tax, total: subtotal + tax, days };
+  };
+
+  const { subtotal, tax, total, days } = calculatePrice();
 
   useEffect(() => {
     if (user) {
@@ -62,10 +75,6 @@ export default function ApartmentDetails({ id }: { id?: string }) {
     e.preventDefault();
     if (!apartment || !apartmentId) return;
 
-    const start = new Date(formData.startDate);
-    const end = new Date(formData.endDate);
-    const days = differenceInDays(end, start);
-
     if (days <= 0) {
       alert("End date must be after start date");
       return;
@@ -78,8 +87,9 @@ export default function ApartmentDetails({ id }: { id?: string }) {
         apartmentName: apartment.name,
         guestUid: user?.uid || null,
         ...formData,
-        totalPrice: days * apartment.pricePerNight,
+        totalPrice: total,
         status: 'pending',
+        paymentStatus: 'unpaid',
         createdAt: serverTimestamp(),
       });
       setBookingSuccess(true);
@@ -99,64 +109,64 @@ export default function ApartmentDetails({ id }: { id?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={`mx-auto max-w-7xl px-4 pt-32 pb-8 sm:px-6 lg:px-8 transition-colors duration-500`}
+      className={`mx-auto max-w-full px-8 lg:px-20 pt-48 pb-24 transition-colors duration-500`}
     >
       <button 
         onClick={() => navigate(-1)} 
-        className={`mb-8 flex items-center gap-2 text-sm font-medium transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-500 hover:text-black'}`}
+        className={`premium-label hover:text-gold-600 transition-colors mb-20 flex items-center gap-4`}
       >
         <ArrowLeft className="h-4 w-4" />
         {t('details.back')}
       </button>
 
-      <div className="grid gap-12 lg:grid-cols-3">
+      <div className="grid gap-24 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2">
-          <div className={`mb-8 overflow-hidden rounded-3xl ${isDark ? 'bg-white/5' : 'bg-neutral-100'}`}>
+          <div className={`mb-20 overflow-hidden rounded-[3rem] shadow-premium ${isDark ? 'bg-white/5' : 'bg-neutral-100'}`}>
             <img
               src={apartment.images[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2000'}
               alt={apartment.name}
-              className="h-[500px] w-full object-cover"
+              className="h-[600px] w-full object-cover"
               referrerPolicy="no-referrer"
             />
           </div>
 
-          <div className="mb-12">
-            <div className={`mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+          <div className="mb-20">
+            <div className={`flex items-center gap-4 premium-label text-gold-600 mb-6`}>
               <MapPin className="h-4 w-4" />
               {apartment.location}
             </div>
-            <h1 className={`mb-6 text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>{apartment.name}</h1>
+            <h1 className={`text-5xl lg:text-7xl italic font-serif tracking-tight mb-12 ${isDark ? 'text-white' : 'text-neutral-900'}`}>{apartment.name}</h1>
             
-            <div className={`mb-8 flex flex-wrap gap-8 py-6 border-y ${isDark ? 'border-white/10' : 'border-neutral-200'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`rounded-full p-2 ${isDark ? 'bg-white/5' : 'bg-neutral-100'}`}><Users className={`h-5 w-5 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`} /></div>
+            <div className={`flex flex-wrap gap-12 py-10 border-y ${isDark ? 'border-white/5' : 'border-neutral-100'}`}>
+              <div className="flex items-center gap-5">
+                <div className={`rounded-full p-4 ${isDark ? 'bg-white/5 text-gold-500' : 'bg-gold-50 text-gold-600'}`}><Users className="h-6 w-6" /></div>
                 <div>
-                  <div className="text-[10px] font-black tracking-widest text-neutral-500 uppercase">{t('details.capacity')}</div>
-                  <div className={`font-bold ${isDark ? 'text-white' : 'text-black'}`}>{apartment.capacity} {t('apartment.guests')}</div>
+                  <div className="premium-label !opacity-40">{t('details.capacity')}</div>
+                  <div className={`text-xl font-serif italic ${isDark ? 'text-white' : 'text-neutral-900'}`}>{apartment.capacity} {t('apartment.guests')}</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className={`rounded-full p-2 ${isDark ? 'bg-white/5' : 'bg-neutral-100'}`}><ShieldCheck className={`h-5 w-5 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`} /></div>
+              <div className="flex items-center gap-5">
+                <div className={`rounded-full p-4 ${isDark ? 'bg-white/5 text-gold-500' : 'bg-gold-50 text-gold-600'}`}><ShieldCheck className="h-6 w-6" /></div>
                 <div>
-                  <div className="text-[10px] font-black tracking-widest text-neutral-500 uppercase">{t('details.verified')}</div>
-                  <div className={`font-bold ${isDark ? 'text-white' : 'text-black'}`}>{t('details.verified_host')}</div>
+                  <div className="premium-label !opacity-40">{t('details.verified')}</div>
+                  <div className={`text-xl font-serif italic ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('details.verified_host')}</div>
                 </div>
               </div>
             </div>
 
-            <div className="mb-12">
-              <h2 className={`mb-4 text-2xl font-bold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('details.description')}</h2>
-              <p className={`text-lg leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>{apartment.description}</p>
+            <div className="mt-20">
+              <h2 className={`premium-label mb-8`}>{t('details.description')}</h2>
+              <p className={`text-xl font-light leading-relaxed tracking-wide ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>{apartment.description}</p>
             </div>
 
-            <div>
-              <h2 className={`mb-6 text-2xl font-bold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('details.amenities')}</h2>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div className="mt-20">
+              <h2 className={`premium-label mb-12`}>{t('details.amenities')}</h2>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {apartment.amenities.map((amenity, i) => (
-                  <div key={i} className={`flex items-center gap-3 rounded-2xl p-4 text-sm font-medium transition-colors ${isDark ? 'bg-white/5 text-neutral-300' : 'bg-neutral-50 text-neutral-700'}`}>
-                    <CheckCircle2 className="h-4 w-4 text-blue-500" />
-                    <span className="capitalize">{amenity}</span>
+                  <div key={i} className={`flex items-center gap-4 rounded-[2rem] p-6 transition-all hover:bg-gold-50 group border border-transparent hover:border-gold-100 ${isDark ? 'bg-white/5 text-neutral-300' : 'bg-white shadow-sm text-neutral-700'}`}>
+                    <CheckCircle2 className="h-5 w-5 text-gold-600 transition-transform group-hover:scale-110" />
+                    <span className="premium-label !text-xs !opacity-100 capitalize">{amenity}</span>
                   </div>
                 ))}
               </div>
@@ -165,100 +175,149 @@ export default function ApartmentDetails({ id }: { id?: string }) {
         </div>
 
         {/* Sidebar / Booking Form */}
-        <div className="lg:sticky lg:top-24 h-fit">
+        <div className="lg:sticky lg:top-32 h-fit">
           {bookingSuccess ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className={`rounded-3xl p-8 text-center ring-1 ${isDark ? 'bg-blue-900/20 ring-blue-500/30' : 'bg-emerald-50 ring-emerald-200'}`}
+              className={`rounded-[3rem] p-12 text-center shadow-premium ${isDark ? 'bg-neutral-900 border border-white/5' : 'bg-white border border-gold-100'}`}
             >
-              <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full ${isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-100 text-emerald-600'}`}>
-                <CheckCircle2 className="h-10 w-10" />
+              <div className={`mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full ${isDark ? 'bg-gold-500/10 text-gold-500' : 'bg-gold-50 text-gold-600'}`}>
+                <CheckCircle2 className="h-12 w-12" />
               </div>
-              <h3 className={`mb-2 text-2xl font-bold ${isDark ? 'text-white' : 'text-emerald-900'}`}>{t('booking.confirmed')}</h3>
-              <p className={`mb-6 ${isDark ? 'text-neutral-400' : 'text-emerald-700'}`}>{t('booking.success_msg')}</p>
+              <h3 className={`text-3xl font-serif italic mb-4 ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('booking.confirmed')}</h3>
+              <p className={`mb-10 font-light tracking-wide ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>{t('booking.success_msg')}</p>
               <button
                 onClick={() => setBookingSuccess(false)}
-                className={`w-full rounded-2xl py-4 font-bold text-white transition-all ${isDark ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                className="luxury-button w-full bg-neutral-900 text-white border-none hover:bg-gold-600"
               >
                 {t('booking.another')}
               </button>
             </motion.div>
           ) : (
-            <div className={`rounded-3xl p-8 shadow-xl ring-1 transition-colors duration-500 ${isDark ? 'bg-white/5 border-white/10 ring-white/10 text-white' : 'bg-white border-neutral-200 ring-neutral-200 text-black'}`}>
-              <div className="mb-8 flex items-end justify-between">
-                <div>
-                  <span className={`text-3xl font-extrabold ${isDark ? 'text-white' : 'text-neutral-900'}`}>${apartment.pricePerNight}</span>
-                  <span className="ml-1 text-sm text-neutral-500">/ {t('common.night')}</span>
-                </div>
+            <div className={`rounded-[3rem] p-12 shadow-premium border transition-all duration-500 ${isDark ? 'bg-neutral-900 border-white/5 text-white' : 'bg-white border-gold-100 text-neutral-950'}`}>
+              <div className="mb-12 flex items-baseline gap-2">
+                <span className={`text-5xl italic font-serif ${isDark ? 'text-gold-500' : 'text-gold-600'}`}>${apartment.pricePerNight}</span>
+                <span className="premium-label !opacity-40">/ {t('common.night')}</span>
               </div>
 
-              <form onSubmit={handleBooking} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">{t('search.checkin').split(' - ')[0]}</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className={`w-full rounded-xl border px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-colors ${isDark ? 'bg-white/5 border-white/10 focus:border-blue-500' : 'bg-white border-neutral-200 focus:border-blue-500'}`}
-                  />
+              <form onSubmit={handleBooking} className="space-y-8">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="premium-label !text-[10px] !opacity-40 leading-none">{t('search.checkin').split(' - ')[0]}</label>
+                    <input
+                      type="date"
+                      required
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                      className={`w-full bg-transparent border-b py-3 text-[10px] font-black tracking-widest outline-none transition-all ${isDark ? 'border-white/10 text-white focus:border-gold-500' : 'border-neutral-200 text-neutral-900 focus:border-gold-600'}`}
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="premium-label !text-[10px] !opacity-40 leading-none">{t('search.checkin').split(' - ')[1]}</label>
+                    <input
+                      type="date"
+                      required
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                      className={`w-full bg-transparent border-b py-3 text-[10px] font-black tracking-widest outline-none transition-all ${isDark ? 'border-white/10 text-white focus:border-gold-500' : 'border-neutral-200 text-neutral-900 focus:border-gold-600'}`}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">{t('search.checkin').split(' - ')[1]}</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className={`w-full rounded-xl border px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-colors ${isDark ? 'bg-white/5 border-white/10 focus:border-blue-500' : 'bg-white border-neutral-200 focus:border-blue-500'}`}
-                  />
-                </div>
-                {/* Other fields similarly updated... */}
-                <div className="space-y-1.5 pt-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">{t('booking.fullname')}</label>
+
+                <div className="space-y-3">
+                  <label className="premium-label !text-[10px] !opacity-40 leading-none">{t('booking.fullname')}</label>
                   <input
                     type="text"
                     required
-                    placeholder="John Doe"
+                    placeholder="ENTER FULL NAME"
                     value={formData.guestName}
                     onChange={(e) => setFormData({ ...formData, guestName: e.target.value })}
-                    className={`w-full rounded-xl border px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-colors ${isDark ? 'bg-white/5 border-white/10 focus:border-blue-500' : 'bg-white border-neutral-200 focus:border-blue-500'}`}
+                    className={`w-full bg-transparent border-b py-3 text-[10px] font-black tracking-widest outline-none transition-all ${isDark ? 'border-white/10 text-white focus:border-gold-500' : 'border-neutral-200 text-neutral-900 focus:border-gold-600'}`}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">{t('booking.email')}</label>
+                
+                <div className="space-y-3">
+                  <label className="premium-label !text-[10px] !opacity-40 leading-none">{t('booking.email')}</label>
                   <input
                     type="email"
                     required
-                    placeholder="john@example.com"
+                    placeholder="EMAIL@DOMAIN.COM"
                     value={formData.guestEmail}
                     onChange={(e) => setFormData({ ...formData, guestEmail: e.target.value })}
-                    className={`w-full rounded-xl border px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-colors ${isDark ? 'bg-white/5 border-white/10 focus:border-blue-500' : 'bg-white border-neutral-200 focus:border-blue-500'}`}
+                    className={`w-full bg-transparent border-b py-3 text-[10px] font-black tracking-widest outline-none transition-all ${isDark ? 'border-white/10 text-white focus:border-gold-500' : 'border-neutral-200 text-neutral-900 focus:border-gold-600'}`}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500">{t('booking.phone')}</label>
+
+                <div className="space-y-3">
+                  <label className="premium-label !text-[10px] !opacity-40 leading-none">{t('booking.phone')}</label>
                   <input
                     type="tel"
                     required
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="PHONE NUMBER"
                     value={formData.guestPhone}
                     onChange={(e) => setFormData({ ...formData, guestPhone: e.target.value })}
-                    className={`w-full rounded-xl border px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-colors ${isDark ? 'bg-white/5 border-white/10 focus:border-blue-500' : 'bg-white border-neutral-200 focus:border-blue-500'}`}
+                    className={`w-full bg-transparent border-b py-3 text-[10px] font-black tracking-widest outline-none transition-all ${isDark ? 'border-white/10 text-white focus:border-gold-500' : 'border-neutral-200 text-neutral-900 focus:border-gold-600'}`}
                   />
                 </div>
+
+                <div className="space-y-4 pt-4">
+                  <label className="premium-label !text-[10px] !opacity-40 leading-none">{t('booking.payment_method')}</label>
+                  <div className="grid grid-cols-1 gap-3">
+                    {[
+                      { id: 'card', label: t('booking.card') },
+                      { id: 'bank', label: t('booking.bank') },
+                      { id: 'momo', label: t('booking.momo') }
+                    ].map((method) => (
+                      <button
+                        key={method.id}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, paymentMethod: method.id })}
+                        className={`flex items-center justify-between rounded-2xl px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all ${
+                          formData.paymentMethod === method.id 
+                            ? (isDark ? 'bg-gold-500 text-black' : 'bg-neutral-900 text-white')
+                            : (isDark ? 'bg-white/5 text-white hover:bg-white/10' : 'bg-neutral-50 text-neutral-600 hover:bg-neutral-100')
+                        }`}
+                      >
+                        {method.label}
+                        <div className={`h-2 w-2 rounded-full ${formData.paymentMethod === method.id ? 'bg-current' : 'border border-current opacity-20'}`} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {days > 0 && (
+                  <div className={`mt-10 rounded-[2rem] p-8 space-y-4 ${isDark ? 'bg-white/5' : 'bg-neutral-50'}`}>
+                    <h4 className="premium-label !text-[10px] !opacity-40 mb-6">{t('booking.details_title')}</h4>
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest leading-none">
+                      <span className="opacity-40">{t('booking.price_per_night')}</span>
+                      <span>${apartment.pricePerNight}</span>
+                    </div>
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest leading-none">
+                      <span className="opacity-40">{t('booking.nights')}</span>
+                      <span className="text-gold-600">{days}</span>
+                    </div>
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest leading-none">
+                      <span className="opacity-40">{t('booking.tax')}</span>
+                      <span>${tax.toFixed(2)}</span>
+                    </div>
+                    <div className={`pt-4 border-t flex justify-between text-base font-serif italic ${isDark ? 'border-white/10' : 'border-neutral-200'}`}>
+                      <span className={isDark ? 'text-white' : 'text-neutral-900'}>{t('booking.total')}</span>
+                      <span className="text-gold-600 tracking-tight font-sans not-italic font-black">${total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
 
                 <button
                   type="submit"
                   disabled={isBooking}
-                  className={`mt-6 w-full rounded-2xl py-4 font-black uppercase tracking-widest text-white transition-all disabled:opacity-50 shadow-xl ${isDark ? 'bg-blue-600 hover:bg-blue-500' : 'bg-black hover:bg-neutral-800'}`}
+                  className={`luxury-button w-full !py-6 mt-12 bg-neutral-950 text-white border-none hover:bg-gold-600 disabled:opacity-50 transition-all duration-500`}
                 >
                   {isBooking ? t('booking.processing') : t('booking.reserve')}
                 </button>
               </form>
               
-              <p className="mt-4 text-center text-[10px] font-bold uppercase tracking-widest text-neutral-500">
+              <p className="mt-8 text-center premium-label !text-[9px] !opacity-30 leading-relaxed uppercase">
                 {t('booking.notice')}
               </p>
             </div>

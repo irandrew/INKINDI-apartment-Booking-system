@@ -17,42 +17,51 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment, id }) => {
   return (
     <motion.div
       id={id}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -8 }}
-      transition={{ duration: 0.4 }}
-      className={`group relative overflow-hidden rounded-[40px] transition-all ring-1 ${isDark ? 'bg-white/5 ring-white/10 hover:ring-white/30' : 'bg-black/5 ring-black/10 hover:ring-black/20'}`}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="group block"
     >
-      <div className="aspect-[11/14] overflow-hidden">
-        <img
-          src={apartment.images[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800'}
-          alt={apartment.name}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-        
-        <div className="absolute top-6 left-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-black text-sm font-black shadow-2xl">
-          ${apartment.pricePerNight}
-        </div>
-      </div>
-      
-      <div className="absolute bottom-0 left-0 right-0 p-8">
-        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">
-          <MapPin className="h-3 w-3 text-blue-500" />
-          <span>{apartment.location}</span>
+      <Link to={`/apartments/${apartment.id}`} className="space-y-6">
+        <div className={`relative overflow-hidden rounded-[3rem] aspect-[10/12] shadow-premium ${isDark ? 'bg-neutral-900 ring-1 ring-white/5' : 'bg-neutral-100'}`}>
+          <img
+            src={apartment.images[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800'}
+            alt={apartment.name}
+            className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+            referrerPolicy="no-referrer"
+          />
+          <div className={`absolute inset-0 transition-colors duration-500 ${isDark ? 'bg-black/20 group-hover:bg-black/0' : 'bg-black/10 group-hover:bg-black/0'}`} />
+          
+          <div className="absolute top-8 right-8 overflow-hidden rounded-full backdrop-blur-xl border border-white/20 bg-white/10 px-6 py-2">
+            <span className="text-sm font-bold text-white tracking-widest leading-none">
+              ${apartment.pricePerNight} <span className="opacity-60 text-[10px] uppercase">/ night</span>
+            </span>
+          </div>
         </div>
         
-        <h3 className="mb-6 text-2xl font-bold tracking-tight text-white font-display leading-tight">{apartment.name}</h3>
-        
-        <Link
-          to={`/apartments/${apartment.id}`}
-          className={`flex items-center justify-between w-full rounded-2xl backdrop-blur-md px-6 py-4 text-xs font-bold uppercase tracking-widest transition-all ${isDark ? 'bg-white/10 text-white hover:bg-white hover:text-black' : 'bg-black/10 text-black hover:bg-black hover:text-white'}`}
-        >
-          {t('apartment.discover')}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
+        <div className="space-y-2 px-2">
+          <div className="flex items-center gap-3">
+            <span className="premium-label tracking-[0.4em]">{apartment.location}</span>
+            <div className={`h-[1px] flex-grow opacity-10 ${isDark ? 'bg-white' : 'bg-black'}`} />
+          </div>
+          
+          <h3 className={`text-4xl italic font-serif leading-tight transition-colors duration-300 group-hover:text-gold-600 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+            {apartment.name}
+          </h3>
+          
+          <div className="flex items-center gap-8 pt-4">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50">
+              <Users className="h-3 w-3" />
+              <span>{apartment.capacity} Guests</span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50">
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-600" />
+              <span>Luxury amenities</span>
+            </div>
+          </div>
+        </div>
+      </Link>
     </motion.div>
   );
 };

@@ -36,107 +36,77 @@ export default function Navbar({ id }: { id?: string }) {
   return (
     <nav 
       id={id} 
-      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-700 ${
         scrolled 
-          ? (isDark ? 'border-b border-white/10 bg-black/80 backdrop-blur-2xl py-0' : 'border-b border-black/5 bg-white/90 backdrop-blur-2xl py-0') 
-          : 'border-b border-transparent bg-transparent py-2'
+          ? (isDark ? 'bg-neutral-950/90 backdrop-blur-2xl py-4 border-b border-white/5' : 'bg-white/90 backdrop-blur-2xl py-4 shadow-sm border-b border-gold-100') 
+          : 'bg-transparent py-8'
       }`}
     >
-      <div className="mx-auto flex h-20 items-center justify-between px-6 sm:px-10 lg:px-12 max-w-7xl">
+      <div className="mx-auto flex items-center justify-between px-8 lg:px-20 max-w-full">
         {/* Logo */}
-        <Link to="/" className={`flex items-center gap-3 text-xl font-bold tracking-tighter font-display transition-colors ${isDark ? 'text-white' : 'text-black'}`}>
-          <div className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all hover:rotate-12 ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>
-            <Hotel className="h-5 w-5" />
+        <Link to="/" className={`flex items-center gap-4 group transition-colors ${isDark ? 'text-white' : 'text-neutral-950'}`}>
+          <div className="relative">
+            <Hotel className={`h-6 w-6 transition-transform duration-500 group-hover:scale-110 ${isDark ? 'text-gold-500' : 'text-gold-600'}`} />
+            <div className={`absolute -inset-2 rounded-full border border-gold-500/20 scale-0 group-hover:scale-100 transition-transform duration-500`} />
           </div>
-          <span className="italic font-serif leading-none">Inkindi</span>
+          <div className="flex flex-col">
+            <span className="text-2xl italic font-serif leading-none tracking-tight">Inkindi</span>
+            <span className="premium-label !text-[8px] opacity-40 mt-1">{t('nav.brand_tagline')}</span>
+          </div>
         </Link>
 
-        {/* Center Section: Links or Mini-Search */}
-        <div className="hidden flex-1 items-center justify-center px-12 md:flex">
-          {!scrolled ? (
-            <div className="flex items-center gap-10">
-              <Link to="/apartments" className={`text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
-                {t('nav.collection')}
-              </Link>
-              <Link to="#" className={`text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
-                {t('nav.amenities')}
-              </Link>
-              <Link to="#" className={`text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
-                {t('nav.journal')}
-              </Link>
-            </div>
-          ) : (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className={`flex items-center gap-6 rounded-full border px-6 py-2.5 shadow-xl transition-all ${isDark ? 'border-white/10 bg-neutral-900/50' : 'border-neutral-200 bg-white'}`}
+        {/* Center Section: Links */}
+        <div className="hidden items-center gap-16 md:flex">
+          {['collection', 'amenities', 'journal'].map((key) => (
+            <Link 
+              key={key}
+              to={key === 'collection' ? '/apartments' : '#'} 
+              className={`premium-label hover:text-gold-600 transition-colors relative group`}
             >
-               <div className="flex items-center gap-3">
-                 <MapPin className="h-3 w-3 text-neutral-400" />
-                 <span className="text-[10px] font-bold tracking-widest">{t('common.location')}</span>
-               </div>
-               <div className="h-4 w-[1px] bg-neutral-500/30" />
-               <div className="flex items-center gap-3">
-                 <Calendar className="h-3 w-3 text-neutral-400" />
-                 <span className="text-[10px] font-bold tracking-widest">{t('search.date_range')}</span>
-               </div>
-               <div className="h-4 w-[1px] bg-neutral-500/30" />
-               <div className="flex items-center gap-3">
-                 <User className="h-3 w-3 text-neutral-400" />
-                 <span className="text-[10px] font-bold tracking-widest italic">{t('common.guests')}</span>
-               </div>
-            </motion.div>
-          )}
+              {t(`nav.${key}`)}
+              <span className="absolute -bottom-2 left-0 h-[1px] w-0 bg-gold-600 transition-all duration-300 group-hover:w-full" />
+            </Link>
+          ))}
         </div>
 
         {/* Right Section */}
-        <div className="hidden items-center gap-4 md:flex">
-          <button 
-            onClick={toggleTheme}
-            className={`flex h-12 w-12 items-center justify-center rounded-full border transition-all active:scale-95 ${isDark ? 'border-white/10 text-white hover:bg-white/10' : 'border-black/10 text-black hover:bg-black/5'}`}
-          >
-            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          
-          <div className="relative">
+        <div className="flex items-center gap-8">
+          <div className="hidden items-center gap-6 md:flex">
             <button 
-              onClick={() => setIsLangOpen(!isLangOpen)}
-              className={`group flex h-12 items-center gap-3 rounded-full border px-6 text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 ${isDark ? 'border-white/10 text-white hover:bg-white/10' : 'border-black/10 text-black hover:bg-black/5'}`}
+              onClick={toggleTheme}
+              className={`p-2 rounded-full transition-colors ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'}`}
             >
-              <Globe className={`h-4 w-4 transition-colors ${isDark ? 'text-neutral-400 group-hover:text-white' : 'text-neutral-500 group-hover:text-black'}`} />
-              <span>{language}</span>
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            
-            {isLangOpen && (
-              <div className={`absolute top-full right-0 mt-2 w-32 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl ${isDark ? 'border-white/10 bg-neutral-900' : 'border-black/10 bg-white'}`}>
-                {['EN', 'FR', 'RW'].map((l) => (
-                  <button
-                    key={l}
-                    onClick={() => { setLanguage(l as any); setIsLangOpen(false); }}
-                    className={`w-full px-4 py-3 text-left text-[10px] font-bold tracking-widest transition-colors ${isDark ? 'text-neutral-400 hover:bg-white/10 hover:text-white' : 'text-neutral-500 hover:bg-black/5 hover:text-black'}`}
-                  >
-                    {l === 'EN' ? 'ENGLISH' : l === 'FR' ? 'FRANÇAIS' : 'KINYARWANDA'}
-                  </button>
-                ))}
+            <div className={`h-4 w-[1px] ${isDark ? 'bg-white/10' : 'bg-neutral-200'}`} />
+          </div>
+
+          <div className="flex items-center gap-4">
+            {!isAdmin ? (
+                <Link 
+                to="/apartments" 
+                className={`luxury-button !py-3 !px-10 ${
+                  isDark 
+                    ? 'bg-neutral-900 text-white border-white/10 hover:bg-gold-600 hover:border-gold-600' 
+                    : 'bg-white text-neutral-950 border-neutral-200 hover:bg-neutral-950 hover:text-white'
+                }`}
+              >
+                {t('nav.book_now')}
+              </Link>
+            ) : (
+              <div className="flex items-center gap-8">
+                <Link to="/admin/dashboard" className="premium-label hover:text-gold-600 transition-colors">
+                  {t('nav.dashboard')}
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="luxury-button !py-3 !px-10"
+                >
+                  {t('nav.signout')}
+                </button>
               </div>
             )}
           </div>
-          
-          <div className={`ml-2 h-8 w-[1px] ${isDark ? 'bg-white/10' : 'bg-black/10'}`} />
-
-          {isAdmin && (
-            <div className="flex items-center gap-6">
-              <Link to="/admin/dashboard" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-black'}`}>
-                {t('nav.dashboard')}
-              </Link>
-              <button 
-                onClick={handleLogout}
-                className={`rounded-xl px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl ${isDark ? 'bg-white text-black hover:bg-neutral-200' : 'bg-black text-white hover:bg-neutral-800'}`}
-              >
-                {t('nav.signout')}
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Mobile menu button */}

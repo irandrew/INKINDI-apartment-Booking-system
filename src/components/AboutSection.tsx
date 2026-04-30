@@ -26,56 +26,57 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className={`py-24 font-sans ${isDark ? 'bg-neutral-900' : 'bg-neutral-50'}`}>
+    <section className={`py-40 font-sans ${isDark ? 'bg-neutral-950' : 'bg-gold-50'}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-center gap-24 lg:grid-cols-2">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="space-y-12"
           >
             <div>
-              <span className="text-xs font-black uppercase tracking-[0.3em] text-blue-600">Our Story</span>
-              <h2 className={`mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                Redefining the Art of <span className="text-blue-600">Living.</span>
+              <span className="premium-label">Our Philosophy</span>
+              <h2 className={`mt-6 text-5xl italic font-serif tracking-tight sm:text-7xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                Refining the Art of <span className="text-gold-600">Elevated Living.</span>
               </h2>
             </div>
             
-            <p className={`text-lg leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
-              Founded in 2020, Inkindi has grown from a local startup to Rwanda's premier luxury apartment provider. We believe that a home is more than just a place to sleep—it's a sanctuary where life happens.
+            <p className={`text-xl font-light leading-relaxed tracking-wide ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+              Inkindi is more than a property manager; we are curators of experience. Founded with a vision to merge Rwandan heritage with global luxury standards, we provide sanctuaries that resonate with soul.
             </p>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-12 sm:grid-cols-3 pt-6">
               {values.map((val, i) => (
-                <div key={i} className="space-y-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/10 text-blue-600">
+                <div key={i} className="space-y-4">
+                  <div className="text-gold-600">
                     {val.icon}
                   </div>
-                  <h4 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{val.title}</h4>
-                  <p className={`text-xs leading-relaxed ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{val.desc}</p>
+                  <h4 className={`text-xs font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-neutral-900'}`}>{val.title}</h4>
+                  <p className={`text-[11px] font-medium leading-relaxed uppercase tracking-wider opacity-60 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>{val.desc}</p>
                 </div>
               ))}
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="aspect-[4/5] overflow-hidden rounded-[3rem] shadow-2xl">
+            <div className="aspect-[4/5] overflow-hidden rounded-[4rem] shadow-premium">
               <img 
-                src="https://images.unsplash.com/photo-1600607687940-4e524cb350b2?auto=format&fit=crop&q=80&w=1000" 
-                alt="Luxury Lobby" 
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&q=80&w=1000" 
+                alt="Luxury Residence" 
+                className="h-full w-full object-cover transition-transform duration-1000 hover:scale-105"
                 referrerPolicy="no-referrer"
               />
             </div>
-            <div className="absolute -bottom-8 -left-8 rounded-[2rem] bg-blue-600 p-10 text-white shadow-xl shadow-blue-500/20 max-w-[240px]">
-              <p className="text-4xl font-black">150+</p>
-              <p className="text-sm font-medium opacity-80 mt-1 uppercase tracking-wider">Premium Properties Managed</p>
+            <div className={`absolute -bottom-12 -left-12 rounded-[3rem] p-12 shadow-2xl backdrop-blur-2xl max-w-[280px] border ${isDark ? 'bg-white/10 border-white/20 text-white' : 'bg-neutral-900 border-neutral-800 text-white'}`}>
+              <p className="text-6xl font-serif italic text-gold-500 line-height-none">150+</p>
+              <p className="text-[10px] font-black uppercase mt-4 tracking-[0.3em] opacity-80">Sanctuaries Curated Across the Region</p>
             </div>
           </motion.div>
         </div>

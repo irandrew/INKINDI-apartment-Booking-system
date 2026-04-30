@@ -11,6 +11,7 @@ import { useApp } from '../context/AppContext';
 import AboutSection from '../components/AboutSection';
 import GallerySection from '../components/GallerySection';
 import BlogSection from '../components/BlogSection';
+import Counter from '../components/Counter';
 
 export default function Home({ id }: { id?: string }) {
   const [featuredApartments, setFeaturedApartments] = useState<Apartment[]>([]);
@@ -78,19 +79,19 @@ export default function Home({ id }: { id?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={`flex flex-col transition-colors duration-500 ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}
+      className={`flex flex-col transition-colors duration-500 ${isDark ? 'bg-neutral-950 text-white' : 'bg-white text-neutral-900'}`}
     >
       {/* Hero Section */}
-      <section className="relative flex min-h-[100vh] items-center justify-center overflow-hidden px-6 pt-12 pb-24">
+      <section className="relative flex min-h-[100vh] items-center justify-center overflow-hidden px-6 pb-24 pt-12">
         {/* Animated Background Slider */}
         <div className="absolute inset-0 z-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ scale: 1.1, opacity: 0 }}
-              animate={{ scale: 1, opacity: 0.4 }}
+              initial={{ scale: 1.05, opacity: 0 }}
+              animate={{ scale: 1, opacity: 0.6 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 2, ease: "easeOut" }}
+              transition={{ duration: 3, ease: [0.25, 0.1, 0.25, 1] }}
               className="absolute inset-0 h-full w-full"
             >
               <img 
@@ -100,114 +101,118 @@ export default function Home({ id }: { id?: string }) {
               />
             </motion.div>
           </AnimatePresence>
-          <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-t from-black via-black/20 to-black/60' : 'bg-gradient-to-t from-white via-white/20 to-white/60'}`} />
+          <div className={`absolute inset-0 ${isDark ? 'bg-neutral-950/60' : 'bg-white/60'}`} />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center">
+        <div className="relative z-10 flex flex-col items-center max-w-[90vw] lg:max-w-7xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
-              transition={{ duration: 0.8 }}
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               className="text-center"
             >
-              <p className={`mb-8 text-[11px] font-black uppercase tracking-[0.6em] ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+              <span className="premium-label mb-10 block opacity-0 animate-[fadeIn_1s_ease_0.2s_forwards]">
                 {t(slides[currentSlide].tagline)}
-              </p>
+              </span>
               
-              <h1 className="mb-16 leading-[0.85]">
-                <span className="block text-[100px] md:text-[220px] font-medium tracking-tighter">
-                  {t(slides[currentSlide].titleMain)} <span className={`italic font-serif font-semibold ${slides[currentSlide].accentColor}`}>{t(slides[currentSlide].titleItalic)}</span>
+              <h1 className="mb-20 leading-[0.8] tracking-tighter">
+                <span className="block text-[14vw] lg:text-[180px] font-black uppercase md:-ml-8">
+                  {t(slides[currentSlide].titleMain)}
                 </span>
-                {slides[currentSlide].titleSub && (
-                  <span className="block text-[80px] md:text-[180px] font-medium tracking-tighter -mt-4 md:-mt-10 opacity-80">
-                    {t(slides[currentSlide].titleSub)}
-                  </span>
-                )}
+                <span className={`block text-[15vw] lg:text-[200px] font-serif italic font-light -mt-4 md:-mt-12 text-gold-600`}>
+                  {t(slides[currentSlide].titleItalic)}
+                </span>
               </h1>
             </motion.div>
           </AnimatePresence>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="w-full max-w-4xl"
+            transition={{ delay: 0.8, duration: 1 }}
+            className="w-full max-w-5xl"
           >
-            <div className={`flex flex-col md:flex-row items-center gap-0 rounded-[2.5rem] border p-2 backdrop-blur-3xl lg:p-3 shadow-2xl transition-all ${isDark ? 'border-white/10 bg-black/40' : 'border-black/5 bg-white/60'}`}>
-              <div className={`flex flex-1 items-center gap-4 px-6 py-4 border-b md:border-b-0 md:border-r ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-                <MapPin className="h-5 w-5 text-neutral-500" />
-                <div className="flex flex-col text-left">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-0.5">{t('search.location')}</span>
-                  <span className="text-sm font-bold tracking-tight">{t('common.location')}</span>
+              <div className={`flex flex-col md:flex-row items-stretch rounded-[3rem] p-4 backdrop-blur-3xl shadow-premium border ${isDark ? 'border-white/10 bg-neutral-900/40' : 'border-gold-100 bg-white/60'}`}>
+                <div className="flex-1 flex flex-col justify-center px-10 py-6">
+                  <span className="premium-label mb-2 opacity-50">{t('search.location')}</span>
+                  <span className="text-xl font-serif italic text-neutral-500">{t('search.location_cta')}</span>
                 </div>
-              </div>
-              <div className={`flex flex-1 items-center gap-4 px-6 py-4 border-b md:border-b-0 md:border-r ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-                <Calendar className="h-5 w-5 text-neutral-500" />
-                <div className="flex flex-col text-left">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-0.5">{t('search.checkin')}</span>
-                  <span className="text-sm font-bold tracking-tight">{t('search.date_range')}</span>
+                <div className={`flex-1 flex flex-col justify-center px-10 py-6 border-y md:border-y-0 md:border-x ${isDark ? 'border-white/10' : 'border-gold-100'}`}>
+                  <span className="premium-label mb-2 opacity-50">{t('search.checkin')}</span>
+                  <span className="text-xl font-serif italic text-neutral-500">{t('search.checkin_cta')}</span>
                 </div>
-              </div>
               <Link 
                 to="/apartments"
-                className={`w-full md:w-auto flex items-center justify-center gap-2 rounded-full px-12 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-2xl ${isDark ? 'bg-white text-black hover:bg-neutral-200' : 'bg-black text-white hover:bg-neutral-800'}`}
+                className={`luxury-button flex items-center justify-center gap-4 py-8 px-16 group transition-all duration-500 border-none ${
+                  isDark ? 'bg-gold-600 text-white hover:bg-gold-500' : 'bg-white text-neutral-950 shadow-premium hover:bg-neutral-950 hover:text-white'
+                }`}
               >
                 {t(slides[currentSlide].cta)}
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
               </Link>
             </div>
           </motion.div>
         </div>
 
         {/* Slider Indicators */}
-        <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 gap-3">
+        <div className="absolute bottom-16 right-16 flex flex-col gap-4">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentSlide(i)}
-              className={`h-[4px] transition-all rounded-full ${currentSlide === i ? 'w-12 bg-white' : 'w-4 bg-white/20 hover:bg-white/40'}`}
-            />
+              className={`group flex items-center gap-4 transition-all`}
+            >
+               <span className={`text-[10px] font-black uppercase tracking-widest transition-all ${currentSlide === i ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}>0{i + 1}</span>
+               <div className={`h-[2px] transition-all rounded-full ${currentSlide === i ? 'w-12 bg-gold-600' : 'w-4 bg-neutral-500/20'}`} />
+            </button>
           ))}
         </div>
       </section>
 
       {/* Featured Apartments */}
-      <section className={`py-32 transition-colors duration-500 ${isDark ? 'bg-[#050505]' : 'bg-neutral-50'}`}>
-        <div className="mx-auto max-w-7xl px-4 flex flex-wrap justify-center sm:justify-between items-center mb-24 gap-8">
+      <section className={`py-40 border-t transition-colors duration-500 ${isDark ? 'bg-neutral-950 border-white/5' : 'bg-white border-neutral-100'}`}>
+        <div className="mx-auto max-w-7xl px-4 grid grid-cols-2 md:grid-cols-4 gap-12 mb-40">
           {[
-            { label: 'Properties', val: '150+' },
-            { label: 'Happy Guests', val: '12K+' },
-            { label: 'Cities', val: '10' },
-            { label: 'Customer Support', val: '24/7' },
+            { label: t('home.stats.properties'), val: '150+' },
+            { label: t('home.stats.stays'), val: '12K+' },
+            { label: t('home.stats.cities'), val: '10' },
+            { label: t('home.stats.service'), val: '24/7' },
           ].map((stat, i) => (
-            <div key={i} className="text-center sm:text-left">
-              <p className="text-2xl font-black text-blue-600">{stat.val}</p>
-              <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`}>{stat.label}</p>
-            </div>
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="text-center md:text-left space-y-2"
+            >
+              <p className="text-5xl font-serif italic text-gold-600">
+                <Counter value={stat.val} />
+              </p>
+              <p className="premium-label opacity-40">{stat.label}</p>
+            </motion.div>
           ))}
         </div>
 
         <AboutSection />
         
-        <div className="mt-32">
-          <GallerySection />
-        </div>
+        <GallerySection />
 
-        <div className="mx-auto max-w-7xl px-6 lg:px-12 mt-32">
-          <div className="mb-16 flex items-end justify-between">
-            <div>
-              <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.3em] text-blue-500">{t('home.featured_sub')}</p>
-              <h2 className={`text-4xl font-bold tracking-tight md:text-5xl ${isDark ? 'text-white' : 'text-black'}`}>{t('home.featured_title')}</h2>
+        <div className="mx-auto max-w-7xl px-6 lg:px-12 mt-40">
+          <div className="mb-24 flex items-end justify-between border-b pb-12 border-neutral-100">
+            <div className="max-w-2xl">
+              <span className="premium-label">{t('home.featured_sub')}</span>
+              <h2 className={`mt-6 text-5xl font-serif italic md:text-7xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('home.featured_title')}</h2>
             </div>
-            <Link to="/apartments" className={`group flex items-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors ${isDark ? 'text-white hover:text-blue-500' : 'text-black hover:text-blue-600'}`}>
+            <Link to="/apartments" className="luxury-button">
               {t('home.explore_all')}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
           
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">
             {loading ? (
               [1, 2, 3].map(i => (
                 <div key={i} className={`h-[500px] animate-pulse rounded-3xl ${isDark ? 'bg-white/5' : 'bg-black/5'}`}></div>
@@ -237,7 +242,7 @@ export default function Home({ id }: { id?: string }) {
           <p className="mb-12 text-xl text-neutral-400 font-medium">{t('home.cta_sub')}</p>
           <Link
             to="/apartments"
-            className={`inline-flex items-center gap-3 rounded-full px-12 py-5 text-sm font-black uppercase tracking-widest transition-all font-display ${isDark ? 'bg-white text-black hover:bg-neutral-200' : 'bg-black text-white hover:bg-neutral-800'}`}
+            className={`inline-flex items-center gap-3 rounded-full px-12 py-5 text-sm font-black uppercase tracking-widest transition-all font-display ${isDark ? 'bg-white text-black hover:bg-neutral-200' : 'bg-white border border-neutral-200 text-neutral-900 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 shadow-premium'}`}
           >
             {t('home.cta_button')}
             <ArrowRight className="h-5 w-5" />

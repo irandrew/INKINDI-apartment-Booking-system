@@ -32,50 +32,48 @@ export default function BlogSection() {
   ];
 
   return (
-    <section className={`py-24 font-sans ${isDark ? 'bg-neutral-950' : 'bg-white'}`}>
+    <section className={`py-40 font-sans ${isDark ? 'bg-neutral-950' : 'bg-white'}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end mb-12">
+        <div className="flex flex-col justify-between gap-12 sm:flex-row sm:items-end mb-24 border-b border-neutral-100 pb-12">
           <div>
-            <span className="text-xs font-black uppercase tracking-[0.3em] text-blue-600">Journal</span>
-            <h2 className={`mt-4 text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-              Insights & <span className="text-blue-600">Lifestyle.</span>
+            <span className="premium-label tracking-[0.4em]">The Journal</span>
+            <h2 className={`mt-6 text-5xl italic font-serif tracking-tight lg:text-7xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              Insights & <span className="text-gold-600">Lifestyle.</span>
             </h2>
           </div>
-          <button className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-blue-600 hover:gap-3 transition-all">
-            View All Posts <ArrowRight className="h-4 w-4" />
+          <button className="luxury-button">
+            View All Stories
           </button>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-16 md:grid-cols-3">
           {posts.map((post, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.1, duration: 0.8 }}
               viewport={{ once: true }}
-              className="group cursor-pointer"
+              className="group cursor-pointer space-y-8"
             >
-              <div className="aspect-[16/10] overflow-hidden rounded-3xl mb-6">
+              <div className="aspect-[4/5] overflow-hidden rounded-[3rem] shadow-premium">
                 <img 
                   src={post.image} 
                   alt={post.title} 
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
               </div>
               <div className="space-y-4">
-                <span className={`inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${isDark ? 'bg-white/10 text-neutral-300' : 'bg-neutral-100 text-neutral-500'}`}>
-                  {post.category}
-                </span>
-                <h3 className={`text-xl font-bold leading-tight group-hover:text-blue-600 transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                <span className="premium-label">{post.category}</span>
+                <h3 className={`text-2xl italic font-serif leading-tight group-hover:text-gold-600 transition-colors duration-300 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                   {post.title}
                 </h3>
-                <div className="flex items-center gap-6 pt-2">
-                  <div className="flex items-center gap-2 text-neutral-500 text-xs font-medium">
+                <div className="flex items-center gap-6 pt-4 border-t border-neutral-100">
+                  <div className="flex items-center gap-2 text-neutral-400 text-[10px] font-black uppercase tracking-widest">
                     <User className="h-3 w-3" /> {post.author}
                   </div>
-                  <div className="flex items-center gap-2 text-neutral-500 text-xs font-medium">
+                  <div className="flex items-center gap-2 text-neutral-400 text-[10px] font-black uppercase tracking-widest">
                     <Clock className="h-3 w-3" /> {post.date}
                   </div>
                 </div>

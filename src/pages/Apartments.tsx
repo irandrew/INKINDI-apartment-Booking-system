@@ -41,39 +41,40 @@ export default function Apartments({ id }: { id?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={`mx-auto max-w-7xl px-4 pt-32 pb-12 sm:px-6 lg:px-8 transition-colors duration-500`}
+      className={`mx-auto max-w-7xl px-8 pt-48 pb-24 transition-colors duration-500`}
     >
-      <header className="mb-12">
-        <h1 className={`mb-4 text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('apartments.title')}</h1>
-        <p className={`text-lg ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>{t('apartments.sub')}</p>
+      <header className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-12">
+        <div className="max-w-2xl">
+          <span className={`premium-label tracking-[0.4em] mb-4 block ${isDark ? 'text-gold-500' : 'text-gold-600'}`}>{t('nav.collection')}</span>
+          <h1 className={`text-5xl italic font-serif tracking-tight lg:text-7xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('apartments.title')}</h1>
+          <p className={`mt-6 text-xl font-light tracking-wide ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>{t('apartments.sub')}</p>
+        </div>
+        
+        <div className="flex items-center gap-4">
+           <div className="relative">
+            <Search className="absolute top-1/2 left-6 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <input
+              type="text"
+              placeholder="Filter by location..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`w-64 lg:w-80 rounded-full border py-4 pr-6 pl-14 text-[10px] font-black uppercase tracking-widest outline-none transition-all ${isDark ? 'border-white/10 bg-white/5 text-white focus:border-gold-500' : 'border-neutral-200 bg-white text-neutral-900 focus:border-gold-600'}`}
+            />
+          </div>
+          <button className="luxury-button !py-4 px-6 md:px-8">
+            <SlidersHorizontal className="h-4 w-4" />
+          </button>
+        </div>
       </header>
 
-      {/* Search and Filters */}
-      <div className="mb-12 flex flex-col gap-4 md:flex-row">
-        <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-neutral-400" />
-          <input
-            type="text"
-            placeholder={t('apartments.search_placeholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={`w-full rounded-2xl border py-3 pr-4 pl-12 text-sm outline-none transition-all focus:ring-2 ${isDark ? 'border-white/10 bg-white/5 text-white focus:border-blue-500 focus:ring-blue-900' : 'border-neutral-200 bg-white text-black focus:border-blue-500 focus:ring-blue-100'}`}
-          />
-        </div>
-        <button className={`flex items-center justify-center gap-2 rounded-2xl border px-6 py-3 text-sm font-semibold transition-colors ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'}`}>
-          <SlidersHorizontal className="h-4 w-4" />
-          {t('apartments.filters')}
-        </button>
-      </div>
-
       {loading ? (
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className={`h-[400px] animate-pulse rounded-2xl ${isDark ? 'bg-white/5' : 'bg-neutral-200'}`}></div>
+            <div key={i} className={`aspect-[10/12] animate-pulse rounded-[3rem] ${isDark ? 'bg-white/5' : 'bg-neutral-100'}`}></div>
           ))}
         </div>
       ) : filteredApartments.length > 0 ? (
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-x-12 gap-y-24 sm:grid-cols-2 lg:grid-cols-3">
           {filteredApartments.map(apt => (
             <ApartmentCard key={apt.id} apartment={apt} />
           ))}

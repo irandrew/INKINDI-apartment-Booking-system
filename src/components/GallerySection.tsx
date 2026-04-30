@@ -18,36 +18,36 @@ export default function GallerySection() {
   ];
 
   return (
-    <section className={`py-24 font-sans ${isDark ? 'bg-neutral-900' : 'bg-neutral-50'}`}>
+    <section className={`py-40 font-sans ${isDark ? 'bg-neutral-900' : 'bg-gold-50'}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-xs font-black uppercase tracking-[0.3em] text-blue-600">Gallery</span>
-          <h2 className={`mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-            Experience <span className="text-blue-600">The Comfort.</span>
+        <div className="text-center mb-24">
+          <span className="premium-label tracking-[0.4em]">Visual Narrative</span>
+          <h2 className={`mt-6 text-5xl italic font-serif tracking-tight sm:text-7xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+            Experience <span className="text-gold-600">The Sanctuary.</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-neutral-500">A visual tour of our finest apartments and amenities designed for your absolute relaxation.</p>
+          <p className="mx-auto mt-6 max-w-2xl text-neutral-500 font-light tracking-wide italic">A curated exploration of our most exclusive residences and communal spaces, designed for the discerning traveler.</p>
         </div>
 
-        <div className="columns-1 gap-6 sm:columns-2 lg:columns-3 space-y-6">
+        <div className="columns-1 gap-12 sm:columns-2 lg:columns-3 space-y-12">
           {images.map((img, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="group relative overflow-hidden rounded-[2rem] cursor-zoom-in"
+              transition={{ delay: i * 0.1, duration: 0.8 }}
+              className="group relative overflow-hidden rounded-[3rem] cursor-zoom-in shadow-premium"
               onClick={() => setSelectedImage(img.url)}
             >
               <img 
                 src={img.url} 
-                className="w-full transition-transform duration-700 group-hover:scale-110" 
+                className="w-full transition-transform duration-[1.5s] group-hover:scale-110" 
                 alt="Property Gallery"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <div className="rounded-full bg-white/20 p-4 backdrop-blur-md text-white">
-                  <Maximize2 className="h-6 w-6" />
+              <div className="absolute inset-0 bg-neutral-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                <div className="luxury-button bg-white/20 backdrop-blur-xl border-white/30 text-white">
+                  Enlarge
                 </div>
               </div>
             </motion.div>

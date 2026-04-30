@@ -1,30 +1,35 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", sans-serif;
-  --font-serif: "Playfair Display", serif;
+  --font-serif: "Cormorant Garamond", serif;
+  --font-display: "Inter", sans-serif;
   
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
+  --color-gold-50: #fafaf6;
+  --color-gold-100: #f5f2ed;
+  --color-gold-500: #c5a059;
+  --color-gold-600: #b08d4a;
+  
+  --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
 }
 
 @layer base {
   body {
-    @apply bg-[#000000] text-white antialiased selection:bg-white selection:text-black;
+    @apply bg-white text-neutral-900 antialiased selection:bg-neutral-900 selection:text-white transition-colors duration-500;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply rounded-xl bg-white px-6 py-3 font-bold text-black transition-all hover:bg-neutral-200 active:scale-95 disabled:opacity-50;
+  .premium-label {
+    @apply text-[10px] font-black uppercase tracking-[0.3em] text-gold-600;
   }
   
-  .glass-card {
-    @apply rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl;
+  .luxury-button {
+    @apply relative overflow-hidden rounded-full border border-neutral-200 px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 hover:bg-neutral-900 hover:text-white active:scale-95;
+  }
+
+  .bento-card {
+    @apply overflow-hidden rounded-[2.5rem] border border-neutral-100 bg-white transition-all duration-500 hover:border-neutral-200 hover:shadow-premium;
   }
 }

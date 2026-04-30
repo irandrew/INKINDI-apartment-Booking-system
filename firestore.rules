@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && getUserRole() == 'super_admin';
+    }
+
+    function isPropertyManager() {
+      return isSignedIn() && getUserRole() == 'property_manager';
+    }
+
+    function isAdmin() {
+      return isSuperAdmin() || isPropertyManager();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Collections ---
+
+    // Apartments: Everyone can read, admins can manage
+    match /apartments/{apartmentId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Bookings: Guests can create, owners and admins can read
+    match /bookings/{bookingId} {
+      allow create: if true;
+      allow read: if isAdmin() || (isSignedIn() && existing().guestUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // Users: Profiles and roles
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
+      allow list: if isSuperAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId && incoming().role == 'guest';
+      allow update: if isSuperAdmin() || (
+        isSignedIn() && request.auth.uid == userId && 
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email'])
+      );
+    }
+  }
+}

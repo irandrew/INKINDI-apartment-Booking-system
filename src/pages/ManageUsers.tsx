@@ -61,7 +61,7 @@ export default function ManageUsers() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="mx-auto max-w-7xl px-4 pt-32 pb-12 sm:px-6 lg:px-8"
+      className="mx-auto max-w-7xl px-4 pt-12 pb-12 sm:px-6 lg:px-8"
     >
       <div className="mb-12">
         <h1 className="text-3xl font-extrabold text-neutral-900 flex items-center gap-3">

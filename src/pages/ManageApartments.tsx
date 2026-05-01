@@ -145,7 +145,7 @@ export default function ManageApartments({ id }: { id?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="mx-auto max-w-7xl px-4 pt-32 pb-12 sm:px-6 lg:px-8"
+      className="mx-auto max-w-7xl px-4 pt-12 pb-12 sm:px-6 lg:px-8"
     >
       <div className="mb-12 flex items-center justify-between">
         <div>

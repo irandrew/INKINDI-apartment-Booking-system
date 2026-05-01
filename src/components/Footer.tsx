@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Hotel, Mail, Phone, MapPin, Instagram, Facebook, Twitter, ArrowRight } from 'lucide-react';
+import { Hotel, Mail, Phone, MapPin, Globe, MessageCircle, Sparkles, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 
@@ -21,7 +21,7 @@ export default function Footer() {
               Curating the finest living experiences across the region. We redefine hospitality through architectural integrity and bespoke service.
             </p>
             <div className="flex gap-6">
-              {[Instagram, Facebook, Twitter].map((Icon, i) => (
+              {[Globe, MessageCircle, Sparkles].map((Icon, i) => (
                 <a key={i} href="#" className={`transition-colors ${isDark ? 'text-neutral-600 hover:text-white' : 'text-neutral-400 hover:text-neutral-900'}`}>
                   <Icon className="h-5 w-5" />
                 </a>
@@ -83,6 +83,7 @@ export default function Footer() {
             © {new Date().getFullYear()} {t('footer.rights')}
           </p>
           <div className="flex gap-10">
+            <Link to="/admin" className={`premium-label !opacity-30 hover:!opacity-100 transition-opacity`}>Admin</Link>
             <Link to="#" className={`premium-label !opacity-30 hover:!opacity-100 transition-opacity`}>Privacy</Link>
             <Link to="#" className={`premium-label !opacity-30 hover:!opacity-100 transition-opacity`}>Terms</Link>
           </div>

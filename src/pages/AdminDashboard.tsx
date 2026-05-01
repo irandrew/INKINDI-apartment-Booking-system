@@ -2,7 +2,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Hotel, CalendarCheck, Users, TrendingUp, Trash2,
-  Play, Calendar as CalendarIcon, ChevronLeft, ChevronRight, User, MapPin, Clock, ArrowRight
+  Play, Calendar as CalendarIcon, ChevronLeft, ChevronRight, User, MapPin, Clock, ArrowRight,
+  PieChart as PieChartIcon, BarChart3
 } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
@@ -12,10 +13,14 @@ import { useApp } from '../context/AppContext';
 import { 
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
   eachDayOfInterval, isSameDay, isToday, addMonths, subMonths,
-  parseISO, isWithinInterval
+  parseISO, isWithinInterval, subDays
 } from 'date-fns';
 import { Booking } from '../types';
 import { Skeleton } from '../components/LoadingComponents';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, AreaChart, Area
+} from 'recharts';
 
 export default function AdminDashboard({ id }: { id?: string }) {
   const { user, profile, loading, isSuperAdmin } = useAuth();
@@ -31,6 +36,50 @@ export default function AdminDashboard({ id }: { id?: string }) {
   // Calendar state
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // Chart Data Processing
+  const chartData = useMemo(() => {
+    if (!bookings.length) return [];
+    
+    // Last 6 months
+    const last6Months = Array.from({ length: 6 }).map((_, i) => {
+      const date = subMonths(new Date(), i);
+      return {
+        month: format(date, 'MMM'),
+        monthFull: format(date, 'yyyy-MM'),
+        bookings: 0,
+        revenue: 0
+      };
+    }).reverse();
+
+    bookings.forEach(b => {
+      const bDate = parseISO(b.startDate);
+      const bMonth = format(bDate, 'yyyy-MM');
+      const monthObj = last6Months.find(m => m.monthFull === bMonth);
+      if (monthObj) {
+        monthObj.bookings += 1;
+        monthObj.revenue += b.totalPrice || 0;
+      }
+    });
+
+    return last6Months;
+  }, [bookings]);
+
+  const statusData = useMemo(() => {
+    const statuses = {
+      confirmed: { name: 'Confirmed', value: 0, color: '#10b981' },
+      pending: { name: 'Pending', value: 0, color: '#f59e0b' },
+      cancelled: { name: 'Cancelled', value: 0, color: '#ef4444' }
+    };
+
+    bookings.forEach(b => {
+      if (statuses[b.status as keyof typeof statuses]) {
+        statuses[b.status as keyof typeof statuses].value += 1;
+      }
+    });
+
+    return Object.values(statuses);
+  }, [bookings]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -157,7 +206,7 @@ export default function AdminDashboard({ id }: { id?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={`mx-auto max-w-7xl px-8 pt-48 pb-24 transition-colors duration-500`}
+      className={`mx-auto max-w-7xl px-8 pt-12 pb-24 transition-colors duration-500`}
     >
       <header className="mb-20 flex flex-col items-start justify-between gap-12 md:flex-row md:items-end">
         <div>
@@ -192,11 +241,11 @@ export default function AdminDashboard({ id }: { id?: string }) {
       </header>
 
       {/* Stats Grid */}
-      <div className="mb-32 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-20 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: "Residences", value: stats.apartments, trend: "Stable" },
           { label: "Bookings", value: stats.bookings, trend: "Growth" },
-          { label: "Revenue", value: `$${stats.bookings * 150}`, trend: "Projected" },
+          { label: "Revenue", value: `$${bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0).toLocaleString()}`, trend: "Projected" },
           { label: "Audience", value: "1.2k", trend: "Active" },
         ].map((stat, i) => (
           <motion.div 
@@ -204,7 +253,7 @@ export default function AdminDashboard({ id }: { id?: string }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bento-card p-10 group hover:border-gold-500/30 transition-all"
+            className={`bento-card p-10 group hover:border-gold-500/30 transition-all ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-neutral-100'}`}
           >
             {dashboardLoading ? (
               <div className="space-y-4">
@@ -214,8 +263,8 @@ export default function AdminDashboard({ id }: { id?: string }) {
               </div>
             ) : (
               <>
-                <div className="premium-label !opacity-40 mb-6 group-hover:!opacity-100 group-hover:text-gold-600 transition-all">{stat.label}</div>
-                <div className="text-6xl italic font-serif text-neutral-900 mb-4 group-hover:scale-110 origin-left transition-transform duration-500">{stat.value}</div>
+                <div className={`premium-label !opacity-40 mb-6 group-hover:!opacity-100 group-hover:text-gold-600 transition-all ${isDark ? 'text-white/40' : 'text-neutral-500'}`}>{stat.label}</div>
+                <div className={`text-6xl italic font-serif mb-4 group-hover:scale-110 origin-left transition-transform duration-500 ${isDark ? 'text-white' : 'text-neutral-900'}`}>{stat.value}</div>
                 <div className="premium-label !text-[8px] text-emerald-600 flex items-center gap-2">
                   <TrendingUp className="h-2 w-2" />
                   {stat.trend}
@@ -224,6 +273,113 @@ export default function AdminDashboard({ id }: { id?: string }) {
             )}
           </motion.div>
         ))}
+      </div>
+
+      {/* Analytics Section */}
+      <div className="mb-32 grid gap-12 lg:grid-cols-3">
+        <div className={`lg:col-span-2 bento-card p-10 ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-neutral-100'}`}>
+          <div className="mb-10 flex items-center justify-between">
+            <div>
+              <h2 className={`text-2xl font-serif italic mb-2 ${isDark ? 'text-white' : 'text-neutral-900'}`}>Revenue Performance</h2>
+              <p className="premium-label !text-[8px] !opacity-40">Monthly Earnings Overview</p>
+            </div>
+            <BarChart3 className="h-5 w-5 text-gold-600 opacity-30" />
+          </div>
+          
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#d4af37" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#d4af37" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} />
+                <XAxis 
+                  dataKey="month" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: isDark ? '#666' : '#999' }} 
+                  dy={10}
+                />
+                <YAxis 
+                  hide={true} 
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: isDark ? '#000' : '#fff', 
+                    border: 'none', 
+                    borderRadius: '16px', 
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                    padding: '12px 16px'
+                  }}
+                  itemStyle={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 900, letterSpacing: '0.1em' }}
+                  cursor={{ stroke: '#d4af37', strokeWidth: 1 }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#d4af37" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorRevenue)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className={`bento-card p-10 ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-neutral-100'}`}>
+          <div className="mb-10 flex items-center justify-between">
+            <div>
+              <h2 className={`text-2xl font-serif italic mb-2 ${isDark ? 'text-white' : 'text-neutral-900'}`}>Status mix</h2>
+              <p className="premium-label !text-[8px] !opacity-40">Booking Distribution</p>
+            </div>
+            <PieChartIcon className="h-5 w-5 text-gold-600 opacity-30" />
+          </div>
+
+          <div className="h-[240px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={8}
+                  dataKey="value"
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: isDark ? '#000' : '#fff', 
+                    border: 'none', 
+                    borderRadius: '16px', 
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                    padding: '12px 16px'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="mt-8 space-y-4">
+            {statusData.map((item, i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>{item.name}</span>
+                </div>
+                <span className={`text-sm font-serif italic ${isDark ? 'text-white' : 'text-neutral-900'}`}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-20 lg:grid-cols-3">

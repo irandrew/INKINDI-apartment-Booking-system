@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -17,9 +17,12 @@ import { AppProvider, useApp } from './context/AppContext';
 
 function AppContent() {
   const { theme } = useApp();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
     <div className={`min-h-screen font-sans transition-colors duration-500 ${theme === 'dark' ? 'bg-neutral-950 text-white' : 'bg-white text-neutral-900'}`}>
-      <Navbar id="main-navbar" />
+      {!isAdminRoute && <Navbar id="main-navbar" />}
       <AnimatePresence mode="wait">
         <Routes>
           {/* Public Routes */}
@@ -37,7 +40,7 @@ function AppContent() {
           <Route path="/admin/users" element={<ManageUsers />} />
         </Routes>
       </AnimatePresence>
-      <Footer />
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }

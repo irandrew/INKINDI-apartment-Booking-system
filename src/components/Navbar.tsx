@@ -38,7 +38,7 @@ export default function Navbar({ id }: { id?: string }) {
       id={id} 
       className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-700 ${
         scrolled 
-          ? (isDark ? 'bg-neutral-950/90 backdrop-blur-2xl py-4 border-b border-white/5' : 'bg-white/90 backdrop-blur-2xl py-4 shadow-sm border-b border-gold-100') 
+          ? (isDark ? 'bg-transparent backdrop-blur-2xl py-4 border-b border-white/5' : 'bg-transparent backdrop-blur-2xl py-4 shadow-sm border-b border-gold-100') 
           : 'bg-transparent py-8'
       }`}
     >
@@ -85,10 +85,10 @@ export default function Navbar({ id }: { id?: string }) {
             {!isAdmin ? (
                 <Link 
                 to="/apartments" 
-                className={`luxury-button !py-3 !px-10 ${
+                className={`luxury-button !py-3 !px-10 !bg-transparent ${
                   isDark 
-                    ? 'bg-neutral-900 text-white border-white/10 hover:bg-gold-600 hover:border-gold-600' 
-                    : 'bg-white text-neutral-950 border-neutral-200 hover:bg-neutral-950 hover:text-white'
+                    ? 'text-white border-white/20 hover:bg-white hover:text-black' 
+                    : 'text-neutral-950 border-neutral-200 hover:bg-neutral-950 hover:text-white'
                 }`}
               >
                 {t('nav.book_now')}
@@ -97,7 +97,11 @@ export default function Navbar({ id }: { id?: string }) {
               <div className="flex items-center gap-8">
                 <button 
                   onClick={handleLogout}
-                  className="luxury-button !py-3 !px-10"
+                  className={`luxury-button !py-3 !px-10 !bg-transparent ${
+                    isDark
+                      ? 'text-white border-white/20 hover:bg-white hover:text-black'
+                      : 'text-neutral-950 border-neutral-200 hover:bg-neutral-950 hover:text-white'
+                  }`}
                 >
                   {t('nav.signout')}
                 </button>
@@ -122,7 +126,7 @@ export default function Navbar({ id }: { id?: string }) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className={`overflow-hidden border-t md:hidden transition-colors duration-500 ${isDark ? 'border-white/10 bg-black text-white' : 'border-black/5 bg-white text-black'}`}
+            className={`overflow-hidden border-t md:hidden transition-colors duration-500 backdrop-blur-2xl ${isDark ? 'border-white/10 bg-black/20 text-white' : 'border-black/5 bg-white/20 text-black'}`}
           >
             <div className="flex flex-col gap-8 p-12">
               <Link to="/apartments" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic">{t('nav.collection')}</Link>

@@ -22,7 +22,7 @@ export default function Home({ id }: { id?: string }) {
 
   const slides = [
     {
-      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2000",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=2000",
       tagline: "home.hero_tagline",
       titleMain: "home.hero_title_art",
       titleItalic: "home.hero_title_ofstaying",
@@ -31,7 +31,7 @@ export default function Home({ id }: { id?: string }) {
       cta: "home.cta_explore"
     },
     {
-      image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=2000",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000",
       tagline: "home.hero_tagline",
       titleMain: "home.hero_title_pure",
       titleItalic: "home.hero_title_design",
@@ -40,7 +40,7 @@ export default function Home({ id }: { id?: string }) {
       cta: "home.cta_view"
     },
     {
-      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000",
+      image: "https://images.unsplash.com/photo-1493246507139-91e8bef99c17?auto=format&fit=crop&q=80&w=2000",
       tagline: "home.hero_tagline",
       titleMain: "home.hero_title_elite",
       titleItalic: "home.hero_title_comfort",
@@ -50,11 +50,12 @@ export default function Home({ id }: { id?: string }) {
     }
   ];
 
+  /* Remove auto-play timer as requested */
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(timer);
+    // const timer = setInterval(() => {
+    //   setCurrentSlide((prev) => (prev + 1) % slides.length);
+    // }, 6000);
+    // return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -88,20 +89,21 @@ export default function Home({ id }: { id?: string }) {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ scale: 1.05, opacity: 0 }}
-              animate={{ scale: 1, opacity: 0.6 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 3, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
               className="absolute inset-0 h-full w-full"
             >
               <img 
                 src={slides[currentSlide].image} 
                 className="h-full w-full object-cover"
                 alt="Architecture"
+                referrerPolicy="no-referrer"
               />
             </motion.div>
           </AnimatePresence>
-          <div className={`absolute inset-0 ${isDark ? 'bg-neutral-950/60' : 'bg-white/60'}`} />
+          <div className={`absolute inset-0 ${isDark ? 'bg-neutral-950/40' : 'bg-white/40'}`} />
         </div>
 
         <div className="relative z-10 flex flex-col items-center max-w-[90vw] lg:max-w-7xl">
@@ -266,12 +268,12 @@ export default function Home({ id }: { id?: string }) {
       <section className={`relative py-48 overflow-hidden border-t transition-colors duration-500 ${isDark ? 'border-white/5 bg-black' : 'border-black/5 bg-neutral-900'}`}>
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1600607687940-47200269556d?auto=format&fit=crop&q=80&w=2000" 
-            className="h-full w-full object-cover opacity-30 grayscale"
-            alt="Inkindi Night"
+            src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2000" 
+            className="h-full w-full object-cover opacity-60"
+            alt="Inkindi Residences"
             referrerPolicy="no-referrer"
           />
-          <div className={`absolute inset-0 ${isDark ? 'bg-black/60' : 'bg-neutral-950/80'}`} />
+          <div className={`absolute inset-0 ${isDark ? 'bg-black/40' : 'bg-neutral-950/70'}`} />
         </div>
         
         <div className="relative z-10 mx-auto max-w-4xl text-center px-6">

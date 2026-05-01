@@ -95,9 +95,6 @@ export default function Navbar({ id }: { id?: string }) {
               </Link>
             ) : (
               <div className="flex items-center gap-8">
-                <Link to="/admin/dashboard" className="premium-label hover:text-gold-600 transition-colors">
-                  {t('nav.dashboard')}
-                </Link>
                 <button 
                   onClick={handleLogout}
                   className="luxury-button !py-3 !px-10"
@@ -133,7 +130,6 @@ export default function Navbar({ id }: { id?: string }) {
               <Link to="#" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic text-neutral-400">{t('nav.journal')}</Link>
               {isAdmin && (
                 <>
-                  <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic">{t('nav.dashboard')}</Link>
                   <button onClick={handleLogout} className="flex items-center gap-4 text-xl font-serif italic text-red-500">
                     <LogOut className="h-5 w-5" /> {t('nav.signout')}
                   </button>

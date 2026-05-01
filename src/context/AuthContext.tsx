@@ -29,31 +29,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (user) {
-        // Fetch or create user profile
-        const profileRef = doc(db, 'users', user.uid);
-        const profileSnap = await getDoc(profileRef);
+      try {
+        setUser(user);
+        if (user) {
+          // Fetch or create user profile
+          const profileRef = doc(db, 'users', user.uid);
+          const profileSnap = await getDoc(profileRef);
 
-        if (profileSnap.exists()) {
-          setProfile(profileSnap.data() as UserProfile);
+          if (profileSnap.exists()) {
+            setProfile(profileSnap.data() as UserProfile);
+          } else {
+            // Create default profile for first-time sign-in
+            const newProfile: UserProfile = {
+              uid: user.uid,
+              email: user.email || '',
+              displayName: user.displayName || 'Guest',
+              role: user.email === 'admin@inkindi.com' ? 'super_admin' : 'guest'
+            };
+            try {
+              await setDoc(profileRef, newProfile);
+              setProfile(newProfile);
+            } catch (err) {
+              console.error("Error creating profile:", err);
+              // Fallback for UI even if setDoc fails
+              setProfile(newProfile);
+            }
+          }
         } else {
-          // Create default profile for first-time sign-in
-          // For demo purposes, we can make the first user a super_admin if we want, 
-          // but usually it's 'guest' by default.
-          const newProfile: UserProfile = {
-            uid: user.uid,
-            email: user.email || '',
-            displayName: user.displayName || 'Guest',
-            role: user.email === 'admin@inkindi.com' ? 'super_admin' : 'guest'
-          };
-          await setDoc(profileRef, newProfile);
-          setProfile(newProfile);
+          setProfile(null);
         }
-      } else {
-        setProfile(null);
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsubscribe;
   }, []);

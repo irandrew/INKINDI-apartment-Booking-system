@@ -11,20 +11,22 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
+    // Role helpers - using a safer check that avoids recursion for self-profile access
     function isSuperAdmin() {
-      return isSignedIn() && getUserRole() == 'super_admin';
+      return isSignedIn() && getUserData().role == 'super_admin';
     }
 
     function isPropertyManager() {
-      return isSignedIn() && getUserRole() == 'property_manager';
+      return isSignedIn() && getUserData().role == 'property_manager';
     }
 
     function isAdmin() {
-      return isSuperAdmin() || isPropertyManager();
+      let role = getUserData().role;
+      return role == 'super_admin' || role == 'property_manager';
     }
 
     function isValidId(id) {
@@ -76,18 +78,27 @@ service cloud.firestore {
     // Bookings: Guests can create, owners and admins can read
     match /bookings/{bookingId} {
       allow create: if true;
-      allow read: if isAdmin() || (isSignedIn() && existing().guestUid == request.auth.uid);
+      allow get: if isAdmin() || (isSignedIn() && existing().guestUid == request.auth.uid);
+      allow list: if isAdmin(); // Strictly enforce listing to admins only
       allow update, delete: if isAdmin();
     }
 
     // Users: Profiles and roles
     match /users/{userId} {
-      allow get: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
-      allow list: if isSuperAdmin();
-      allow create: if isSignedIn() && request.auth.uid == userId && incoming().role == 'guest';
-      allow update: if isSuperAdmin() || (
-        isSignedIn() && request.auth.uid == userId && 
-        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email'])
+      // Accessing own profile
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      
+      // Super admin can read any profile and list all
+      allow get, list: if isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+
+      allow create: if isSignedIn() && request.auth.uid == userId && (
+        incoming().role == 'guest' || 
+        (request.auth.token.email == 'admin@inkindi.com' && incoming().role == 'super_admin')
+      );
+      
+      allow update: if isSignedIn() && (
+        (request.auth.uid == userId && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email'])) ||
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin')
       );
 
       // Favorites subcollection

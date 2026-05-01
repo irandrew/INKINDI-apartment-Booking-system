@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { Apartment } from '../types';
-import { Plus, Trash2, Edit2, X, Check, MapPin, DollarSign, Image as ImageIcon, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Check, MapPin, DollarSign, Image as ImageIcon, AlertTriangle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ImageUpload from '../components/ImageUpload';
@@ -11,7 +11,7 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 
 export default function ManageApartments({ id }: { id?: string }) {
-  const { user, isSuperAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, isSuperAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { t } = useApp();
   const [apartments, setApartments] = useState<Apartment[]>([]);
@@ -54,10 +54,11 @@ export default function ManageApartments({ id }: { id?: string }) {
   };
 
   useEffect(() => {
-    if (!authLoading && !user) navigate('/admin');
-  }, [user, authLoading, navigate]);
+    if (!authLoading && (!user || !isAdmin)) navigate('/admin');
+  }, [user, isAdmin, authLoading, navigate]);
 
   const fetchApartments = async () => {
+    if (!isAdmin) return;
     try {
       const querySnapshot = await getDocs(collection(db, 'apartments'));
       const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Apartment[];
@@ -69,7 +70,9 @@ export default function ManageApartments({ id }: { id?: string }) {
     }
   };
 
-  useEffect(() => { fetchApartments(); }, []);
+  useEffect(() => { 
+    if (isAdmin) fetchApartments(); 
+  }, [isAdmin]);
 
   const handleEdit = (apt: Apartment) => {
     setEditingId(apt.id);
@@ -137,7 +140,13 @@ export default function ManageApartments({ id }: { id?: string }) {
     }
   };
 
-  if (authLoading || loading) return null;
+  if (authLoading || loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-gold-600" />
+      </div>
+    );
+  }
 
   return (
     <motion.div

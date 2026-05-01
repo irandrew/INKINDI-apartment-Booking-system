@@ -3,24 +3,25 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { Booking } from '../types';
-import { Check, X, Mail, Phone, Calendar, Clock, Trash2 } from 'lucide-react';
+import { Check, X, Mail, Phone, Calendar, Clock, Trash2, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Skeleton } from '../components/LoadingComponents';
 
 export default function ManageBookings({ id }: { id?: string }) {
-  const { user, isSuperAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, isSuperAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { t } = useApp();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !user) navigate('/admin');
-  }, [user, authLoading, navigate]);
+    if (!authLoading && (!user || !isAdmin)) navigate('/admin');
+  }, [user, isAdmin, authLoading, navigate]);
 
   const fetchBookings = async () => {
+    if (!isAdmin) return;
     try {
       const querySnapshot = await getDocs(collection(db, 'bookings'));
       const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Booking[];
@@ -32,7 +33,9 @@ export default function ManageBookings({ id }: { id?: string }) {
     }
   };
 
-  useEffect(() => { fetchBookings(); }, []);
+  useEffect(() => { 
+    if (isAdmin) fetchBookings(); 
+  }, [isAdmin]);
 
   const updateStatus = async (id: string, status: 'confirmed' | 'cancelled') => {
     try {
@@ -78,7 +81,13 @@ export default function ManageBookings({ id }: { id?: string }) {
     }
   };
 
-  if (authLoading) return null;
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-gold-600" />
+      </div>
+    );
+  }
 
   return (
     <motion.div

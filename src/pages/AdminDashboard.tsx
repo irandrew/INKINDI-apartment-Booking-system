@@ -3,11 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Hotel, CalendarCheck, Users, TrendingUp, Trash2,
   Play, Calendar as CalendarIcon, ChevronLeft, ChevronRight, User, MapPin, Clock, ArrowRight,
-  PieChart as PieChartIcon, BarChart3
+  PieChart as PieChartIcon, BarChart3, Loader2
 } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { 
@@ -23,7 +23,7 @@ import {
 } from 'recharts';
 
 export default function AdminDashboard({ id }: { id?: string }) {
-  const { user, profile, loading, isSuperAdmin } = useAuth();
+  const { user, profile, loading, isAdmin, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const { t, theme } = useApp();
   const isDark = theme === 'dark';
@@ -82,12 +82,13 @@ export default function AdminDashboard({ id }: { id?: string }) {
   }, [bookings]);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && (!user || !isAdmin)) {
       navigate('/admin');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, isAdmin, navigate]);
 
   const fetchDashboardData = async () => {
+    if (!isAdmin) return;
     setDashboardLoading(true);
     try {
       const [aptsSnapshot, bksSnapshot] = await Promise.all([
@@ -99,15 +100,15 @@ export default function AdminDashboard({ id }: { id?: string }) {
       setBookings(bksData);
       setStats({ apartments: aptsSnapshot.size, bookings: bksSnapshot.size });
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      handleFirestoreError(error, OperationType.GET, 'dashboard_data');
     } finally {
       setDashboardLoading(false);
     }
   };
 
   useEffect(() => {
-    if (user) fetchDashboardData();
-  }, [user]);
+    if (user && isAdmin) fetchDashboardData();
+  }, [user, isAdmin]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth));
@@ -177,7 +178,7 @@ export default function AdminDashboard({ id }: { id?: string }) {
       await batch.commit();
       window.location.reload();
     } catch (error) {
-      console.error("Error generating data:", error);
+      handleFirestoreError(error, OperationType.WRITE, 'apartments_seed');
     } finally {
       setIsGenerating(false);
     }
@@ -194,11 +195,20 @@ export default function AdminDashboard({ id }: { id?: string }) {
       await batch.commit();
       window.location.reload();
     } catch (error) {
-      console.error("Error clearing data:", error);
+      handleFirestoreError(error, OperationType.DELETE, 'bulk_purge');
     }
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-gold-600" />
+          <span className="premium-label !text-[10px] animate-pulse">Initializing Portal...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -215,7 +225,7 @@ export default function AdminDashboard({ id }: { id?: string }) {
           <p className="mt-4 text-neutral-500 font-light tracking-wide lg:text-lg">
             Welcome, {user?.displayName || 'Administrator'} 
             <span className="ml-4 premium-label !text-[8px] !opacity-40">
-              {profile?.role.replace('_', ' ')}
+              {profile?.role ? profile.role.replace('_', ' ') : 'Manager'}
             </span>
           </p>
         </div>

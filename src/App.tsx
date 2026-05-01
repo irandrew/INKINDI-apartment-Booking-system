@@ -10,6 +10,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import ManageApartments from './pages/ManageApartments';
 import ManageBookings from './pages/ManageBookings';
 import ManageUsers from './pages/ManageUsers';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentCancel from './pages/PaymentCancel';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider, useApp } from './context/AppContext';
 
@@ -24,6 +26,8 @@ function AppContent() {
           <Route path="/" element={<Home id="home-page" />} />
           <Route path="/apartments" element={<Apartments id="apartments-page" />} />
           <Route path="/apartments/:id" element={<ApartmentDetails id="apartment-details-page" />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancel" element={<PaymentCancel />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin id="admin-login-page" />} />

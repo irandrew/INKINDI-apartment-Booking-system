@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
@@ -7,6 +7,7 @@ import { Check, X, Mail, Phone, Calendar, Clock, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { Skeleton } from '../components/LoadingComponents';
 
 export default function ManageBookings({ id }: { id?: string }) {
   const { user, isSuperAdmin, loading: authLoading } = useAuth();
@@ -77,7 +78,7 @@ export default function ManageBookings({ id }: { id?: string }) {
     }
   };
 
-  if (authLoading || loading) return null;
+  if (authLoading) return null;
 
   return (
     <motion.div
@@ -93,14 +94,59 @@ export default function ManageBookings({ id }: { id?: string }) {
       </div>
 
       <div className="space-y-6">
-        {bookings.length > 0 ? (
-          bookings.map((booking) => (
-            <motion.div
-              key={booking.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md"
-            >
+        {loading ? (
+          <div className="space-y-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="rounded-3xl border border-neutral-100 bg-white/50 p-6 shadow-sm">
+                <div className="flex flex-col md:flex-row justify-between gap-6">
+                  <div className="flex-1 space-y-4">
+                    <div className="flex gap-3">
+                      <Skeleton className="h-6 w-32 rounded-full" />
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Skeleton className="h-4 w-full rounded-full" />
+                      <Skeleton className="h-4 w-full rounded-full" />
+                      <Skeleton className="h-4 w-full rounded-full" />
+                      <Skeleton className="h-4 w-full rounded-full" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-4">
+                    <Skeleton className="h-10 w-24 rounded-xl" />
+                    <div className="flex gap-2">
+                       <Skeleton className="h-10 w-10 rounded-xl" />
+                       <Skeleton className="h-10 w-10 rounded-xl" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : bookings.length > 0 ? (
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            initial="hidden"
+            animate="show"
+            className="space-y-6"
+          >
+            {bookings.map((booking) => (
+              <motion.div
+                key={booking.id}
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  show: { opacity: 1, x: 0 }
+                }}
+                className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md"
+              >
               <div className="flex flex-col justify-between gap-6 md:flex-row">
                 <div className="flex-1">
                   <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -151,38 +197,48 @@ export default function ManageBookings({ id }: { id?: string }) {
                         Mark Paid
                       </button>
                     )}
-                    <div className="flex gap-2">
-                      {booking.status === 'pending' && (
-                        <>
-                          <button 
-                            onClick={() => updateStatus(booking.id, 'confirmed')}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-100 hover:bg-emerald-500"
-                          >
-                            <Check className="h-5 w-5" />
-                          </button>
-                          <button 
-                            onClick={() => updateStatus(booking.id, 'cancelled')}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white shadow-lg shadow-red-100 hover:bg-red-500"
-                          >
-                            <X className="h-5 w-5" />
-                          </button>
-                        </>
-                      )}
-                      {isSuperAdmin && (
-                        <button 
-                          onClick={() => handleDelete(booking.id)}
-                          className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      )}
-                    </div>
+                    
+                    {booking.status === 'pending' && (
+                      <button 
+                        onClick={() => updateStatus(booking.id, 'confirmed')}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-100 hover:bg-emerald-500"
+                        title="Confirm Booking"
+                      >
+                        <Check className="h-5 w-5" />
+                      </button>
+                    )}
+
+                    {booking.status !== 'cancelled' && (
+                      <button 
+                        onClick={() => {
+                          if (confirm(t('admin.confirm_cancel') || 'Are you sure you want to cancel this booking?')) {
+                            updateStatus(booking.id, 'cancelled');
+                          }
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-red-600 text-white hover:bg-red-500 shadow-lg shadow-red-100"
+                        title="Cancel Booking"
+                      >
+                        <X className="h-3 w-3" />
+                        Cancel
+                      </button>
+                    )}
+
+                    {isSuperAdmin && (
+                      <button 
+                        onClick={() => handleDelete(booking.id)}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
+                        title="Delete Booking"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             </motion.div>
-          ))
-        ) : (
+          ))}
+        </motion.div>
+      ) : (
           <div className="rounded-3xl border border-dashed border-neutral-300 py-24 text-center">
             <Clock className="mx-auto mb-4 h-12 w-12 text-neutral-300" />
             <h3 className="text-lg font-bold text-neutral-900">{t('admin.no_bookings')}</h3>

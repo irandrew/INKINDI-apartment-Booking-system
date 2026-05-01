@@ -68,8 +68,8 @@ export default function AboutSection() {
           >
             <div className="aspect-[4/5] overflow-hidden rounded-[4rem] shadow-premium">
               <img 
-                src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&q=80&w=1000" 
-                alt="Luxury Residence" 
+                src="https://images.unsplash.com/photo-1618221415035-02603bb624ce?auto=format&fit=crop&q=80&w=1000" 
+                alt="Luxury Residence Interior" 
                 className="h-full w-full object-cover transition-transform duration-1000 hover:scale-105"
                 referrerPolicy="no-referrer"
               />

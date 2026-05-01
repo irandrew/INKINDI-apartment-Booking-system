@@ -9,21 +9,21 @@ export default function BlogSection() {
 
   const posts = [
     {
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=600',
+      image: 'https://images.unsplash.com/photo-1600210491892-03d94ac25655?auto=format&fit=crop&q=80&w=600',
       category: 'Lifestyle',
       title: '10 Ways to Decorate Your Luxury Apartment',
       author: 'John Kamau',
       date: 'Oct 12, 2023'
     },
     {
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=600',
+      image: 'https://images.unsplash.com/photo-1620332372374-f108c53d2e03?auto=format&fit=crop&q=80&w=600',
       category: 'Real Estate',
       title: 'Why Kigali is the Best City for Investment',
       author: 'Sarah Umutesi',
       date: 'Oct 05, 2023'
     },
     {
-      image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=600',
+      image: 'https://images.unsplash.com/photo-1615529328219-e3328e7e319d?auto=format&fit=crop&q=80&w=600',
       category: 'Design',
       title: 'The Future of Urban Living Spaces',
       author: 'Eric Nshimiye',

@@ -22,7 +22,7 @@ export default function Home({ id }: { id?: string }) {
 
   const slides = [
     {
-      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000",
+      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2000",
       tagline: "home.hero_tagline",
       titleMain: "home.hero_title_art",
       titleItalic: "home.hero_title_ofstaying",
@@ -31,7 +31,7 @@ export default function Home({ id }: { id?: string }) {
       cta: "home.cta_explore"
     },
     {
-      image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=2000",
+      image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=2000",
       tagline: "home.hero_tagline",
       titleMain: "home.hero_title_pure",
       titleItalic: "home.hero_title_design",
@@ -40,7 +40,7 @@ export default function Home({ id }: { id?: string }) {
       cta: "home.cta_view"
     },
     {
-      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2000",
+      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000",
       tagline: "home.hero_tagline",
       titleMain: "home.hero_title_elite",
       titleItalic: "home.hero_title_comfort",
@@ -202,33 +202,60 @@ export default function Home({ id }: { id?: string }) {
         <GallerySection />
 
         <div className="mx-auto max-w-7xl px-6 lg:px-12 mt-40">
-          <div className="mb-24 flex items-end justify-between border-b pb-12 border-neutral-100">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-24 flex flex-col md:flex-row items-start md:items-end justify-between border-b pb-12 border-neutral-100"
+          >
             <div className="max-w-2xl">
               <span className="premium-label">{t('home.featured_sub')}</span>
               <h2 className={`mt-6 text-5xl font-serif italic md:text-7xl ${isDark ? 'text-white' : 'text-neutral-900'}`}>{t('home.featured_title')}</h2>
             </div>
-            <Link to="/apartments" className="luxury-button">
+            <Link to="/apartments" className="luxury-button mt-8 md:mt-0">
               {t('home.explore_all')}
             </Link>
-          </div>
+          </motion.div>
           
-          <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.2
+                }
+              }
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {loading ? (
               [1, 2, 3].map(i => (
                 <div key={i} className={`h-[500px] animate-pulse rounded-3xl ${isDark ? 'bg-white/5' : 'bg-black/5'}`}></div>
               ))
             ) : featuredApartments.length > 0 ? (
               featuredApartments.map(apt => (
-                <div key={apt.id} className={isDark ? 'dark-card-wrapper' : ''}>
+                <motion.div 
+                  key={apt.id} 
+                  variants={{
+                    hidden: { opacity: 0, y: 30, scale: 0.95 },
+                    show: { opacity: 1, y: 0, scale: 1 }
+                  }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  className={isDark ? 'dark-card-wrapper' : ''}
+                >
                   <ApartmentCard apartment={apt} />
-                </div>
+                </motion.div>
               ))
             ) : (
               <div className={`col-span-full py-24 text-center rounded-3xl border border-dashed ${isDark ? 'text-neutral-500 border-white/10' : 'text-neutral-400 border-black/10'}`}>
                 {t('apartments.private')}
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -236,17 +263,37 @@ export default function Home({ id }: { id?: string }) {
       <BlogSection />
 
       {/* CTA Section */}
-      <section className={`relative py-40 overflow-hidden border-t transition-colors duration-500 ${isDark ? 'border-white/5 bg-black' : 'border-black/5 bg-neutral-50'}`}>
+      <section className={`relative py-48 overflow-hidden border-t transition-colors duration-500 ${isDark ? 'border-white/5 bg-black' : 'border-black/5 bg-neutral-900'}`}>
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1600607687940-47200269556d?auto=format&fit=crop&q=80&w=2000" 
+            className="h-full w-full object-cover opacity-30 grayscale"
+            alt="Inkindi Night"
+            referrerPolicy="no-referrer"
+          />
+          <div className={`absolute inset-0 ${isDark ? 'bg-black/60' : 'bg-neutral-950/80'}`} />
+        </div>
+        
         <div className="relative z-10 mx-auto max-w-4xl text-center px-6">
-          <h2 className={`mb-8 text-5xl font-medium tracking-tight md:text-7xl font-display ${isDark ? 'text-white' : 'text-black'}`}>{t('home.cta_title')}</h2>
-          <p className="mb-12 text-xl text-neutral-400 font-medium">{t('home.cta_sub')}</p>
-          <Link
-            to="/apartments"
-            className={`inline-flex items-center gap-3 rounded-full px-12 py-5 text-sm font-black uppercase tracking-widest transition-all font-display ${isDark ? 'bg-white text-black hover:bg-neutral-200' : 'bg-white border border-neutral-200 text-neutral-900 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 shadow-premium'}`}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
           >
-            {t('home.cta_button')}
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+            <h2 className="mb-8 text-5xl font-medium tracking-tight md:text-8xl font-display text-white italic font-serif leading-none">
+              {t('home.cta_title')}
+            </h2>
+            <p className="mb-16 text-xl text-neutral-400 font-light tracking-widest uppercase">
+              {t('home.cta_sub')}
+            </p>
+            <Link
+              to="/apartments"
+              className="inline-flex items-center gap-6 rounded-full px-16 py-7 text-xs font-black uppercase tracking-[0.4em] transition-all font-display bg-gold-600 text-white hover:bg-gold-500 shadow-2xl"
+            >
+              {t('home.cta_button')}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
         </div>
       </section>
     </motion.div>

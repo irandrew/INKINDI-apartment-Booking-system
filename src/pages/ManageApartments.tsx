@@ -28,8 +28,30 @@ export default function ManageApartments({ id }: { id?: string }) {
     capacity: '',
     description: '',
     images: [] as string[],
-    amenities: ''
+    amenities: [] as string[],
+    lat: '',
+    lng: '',
+    cancellationPolicy: ''
   });
+
+  const [newAmenity, setNewAmenity] = useState('');
+
+  const addAmenity = () => {
+    if (newAmenity.trim() && !formData.amenities.includes(newAmenity.trim())) {
+      setFormData({
+        ...formData,
+        amenities: [...formData.amenities, newAmenity.trim()]
+      });
+      setNewAmenity('');
+    }
+  };
+
+  const removeAmenity = (index: number) => {
+    setFormData({
+      ...formData,
+      amenities: formData.amenities.filter((_, i) => i !== index)
+    });
+  };
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/admin');
@@ -58,7 +80,10 @@ export default function ManageApartments({ id }: { id?: string }) {
       capacity: apt.capacity.toString(),
       description: apt.description,
       images: apt.images,
-      amenities: apt.amenities.join(', ')
+      amenities: apt.amenities,
+      lat: apt.lat?.toString() || '',
+      lng: apt.lng?.toString() || '',
+      cancellationPolicy: apt.cancellationPolicy || ''
     });
     setIsModalOpen(true);
   };
@@ -66,7 +91,7 @@ export default function ManageApartments({ id }: { id?: string }) {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    setFormData({ name: '', location: '', pricePerNight: '', capacity: '', description: '', images: [], amenities: '' });
+    setFormData({ name: '', location: '', pricePerNight: '', capacity: '', description: '', images: [], amenities: [], lat: '', lng: '', cancellationPolicy: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,7 +101,10 @@ export default function ManageApartments({ id }: { id?: string }) {
       pricePerNight: Number(formData.pricePerNight),
       capacity: Number(formData.capacity),
       images: formData.images,
-      amenities: formData.amenities.split(',').map(s => s.trim()).filter(s => s)
+      amenities: formData.amenities,
+      lat: formData.lat ? Number(formData.lat) : undefined,
+      lng: formData.lng ? Number(formData.lng) : undefined,
+      cancellationPolicy: formData.cancellationPolicy
     };
 
     try {
@@ -201,6 +229,16 @@ export default function ManageApartments({ id }: { id?: string }) {
                 <label className="text-xs font-bold uppercase text-neutral-500">{t('common.price')} / {t('common.night')} ($)</label>
                 <input required type="number" value={formData.pricePerNight} onChange={e => setFormData({...formData, pricePerNight: e.target.value})} className="rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" />
               </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase text-neutral-500">Latitude (e.g. -1.9441)</label>
+                <input type="number" step="any" value={formData.lat} onChange={e => setFormData({...formData, lat: e.target.value})} className="rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase text-neutral-500">Longitude (e.g. 30.0619)</label>
+                <input type="number" step="any" value={formData.lng} onChange={e => setFormData({...formData, lng: e.target.value})} className="rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" />
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold uppercase text-neutral-500">{t('details.capacity')} ({t('common.guests')})</label>
                 <input required type="number" value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})} className="rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" />
@@ -210,6 +248,10 @@ export default function ManageApartments({ id }: { id?: string }) {
                 <textarea required rows={3} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" />
               </div>
               <div className="col-span-2 flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase text-neutral-500">Cancellation Policy</label>
+                <textarea rows={2} value={formData.cancellationPolicy} onChange={e => setFormData({...formData, cancellationPolicy: e.target.value})} placeholder="e.g. Free cancellation up to 48 hours before check-in" className="rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" />
+              </div>
+              <div className="col-span-2 flex flex-col gap-1.5">
                 <label className="text-xs font-bold uppercase text-neutral-500">Apartment Images</label>
                 <ImageUpload 
                   initialUrls={formData.images} 
@@ -217,8 +259,45 @@ export default function ManageApartments({ id }: { id?: string }) {
                 />
               </div>
               <div className="col-span-2 flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase text-neutral-500">{t('details.amenities')} (comma separated)</label>
-                <input value={formData.amenities} onChange={e => setFormData({...formData, amenities: e.target.value})} className="rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" />
+                <label className="text-xs font-bold uppercase text-neutral-500">{t('details.amenities')}</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.amenities.map((amenity, index) => (
+                    <span 
+                      key={index} 
+                      className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600 ring-1 ring-blue-100"
+                    >
+                      {amenity}
+                      <button 
+                        type="button" 
+                        onClick={() => removeAmenity(index)}
+                        className="hover:text-blue-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    value={newAmenity} 
+                    onChange={e => setNewAmenity(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addAmenity();
+                      }
+                    }}
+                    placeholder="Add amenity (e.g. Wifi, Pool)..."
+                    className="flex-1 rounded-xl border border-neutral-200 px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500" 
+                  />
+                  <button 
+                    type="button"
+                    onClick={addAmenity}
+                    className="rounded-xl bg-neutral-900 px-4 font-bold text-white hover:bg-neutral-800"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
               <div className="col-span-2 mt-4 flex gap-4">
                 <button type="button" onClick={closeModal} className="flex-1 rounded-xl bg-neutral-100 py-3 font-bold text-neutral-700 hover:bg-neutral-200">{t('common.cancel')}</button>

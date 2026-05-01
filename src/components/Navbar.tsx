@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { auth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function Navbar({ id }: { id?: string }) {
   const { user, isAdmin } = useAuth();
@@ -118,22 +118,31 @@ export default function Navbar({ id }: { id?: string }) {
       </div>
 
       {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className={`border-t p-8 md:hidden transition-colors duration-500 ${isDark ? 'border-white/10 bg-black text-white' : 'border-black/5 bg-white text-black'}`}>
-          <div className="flex flex-col gap-6">
-            <Link to="/apartments" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest">{t('nav.collection')}</Link>
-            <Link to="#" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest">{t('nav.amenities')}</Link>
-            {isAdmin && (
-              <>
-                <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest">{t('nav.dashboard')}</Link>
-                <button onClick={handleLogout} className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-red-500">
-                  <LogOut className="h-4 w-4" /> {t('nav.signout')}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className={`overflow-hidden border-t md:hidden transition-colors duration-500 ${isDark ? 'border-white/10 bg-black text-white' : 'border-black/5 bg-white text-black'}`}
+          >
+            <div className="flex flex-col gap-8 p-12">
+              <Link to="/apartments" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic">{t('nav.collection')}</Link>
+              <Link to="#" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic text-neutral-400">{t('nav.amenities')}</Link>
+              <Link to="#" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic text-neutral-400">{t('nav.journal')}</Link>
+              {isAdmin && (
+                <>
+                  <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic">{t('nav.dashboard')}</Link>
+                  <button onClick={handleLogout} className="flex items-center gap-4 text-xl font-serif italic text-red-500">
+                    <LogOut className="h-5 w-5" /> {t('nav.signout')}
+                  </button>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

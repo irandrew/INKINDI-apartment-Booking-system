@@ -16,6 +16,18 @@ export interface Apartment {
   location: string;
   amenities: string[];
   capacity: number;
+  lat?: number;
+  lng?: number;
+  cancellationPolicy?: string;
+}
+
+export interface Review {
+  id: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: any;
 }
 
 export interface Booking {

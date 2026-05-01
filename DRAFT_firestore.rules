@@ -47,15 +47,6 @@ service cloud.firestore {
              (!('cancellationPolicy' in data) || (data.cancellationPolicy is string && data.cancellationPolicy.size() <= 1000));
     }
 
-    function isValidReview(data) {
-      return data.keys().hasAll(['userId', 'userName', 'rating', 'comment', 'createdAt']) &&
-             data.userId == request.auth.uid &&
-             data.userName is string &&
-             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
-             data.comment is string && data.comment.size() <= 5000 &&
-             data.createdAt == request.time;
-    }
-
     // --- Collections ---
 
     // Apartments: Everyone can read, admins can manage
@@ -64,13 +55,6 @@ service cloud.firestore {
       allow create: if isAdmin() && isValidApartment(incoming());
       allow update: if isAdmin() && isValidApartment(incoming());
       allow delete: if isAdmin();
-
-      // Reviews subcollection
-      match /reviews/{reviewId} {
-        allow read: if true;
-        allow create: if isSignedIn() && isValidReview(incoming());
-        allow update, delete: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
-      }
     }
 
     // Bookings: Guests can create, owners and admins can read
@@ -89,11 +73,6 @@ service cloud.firestore {
         isSignedIn() && request.auth.uid == userId && 
         incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email'])
       );
-
-      // Favorites subcollection
-      match /favorites/{apartmentId} {
-        allow read, write: if isSignedIn() && request.auth.uid == userId;
-      }
     }
   }
 }

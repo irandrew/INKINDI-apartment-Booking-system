@@ -11,7 +11,10 @@
         "images": { "type": "array", "items": { "type": "string" } },
         "location": { "type": "string" },
         "amenities": { "type": "array", "items": { "type": "string" } },
-        "capacity": { "type": "number" }
+        "capacity": { "type": "number" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "cancellationPolicy": { "type": "string" }
       },
       "required": ["name", "pricePerNight", "location"]
     },
@@ -29,9 +32,11 @@
         "endDate": { "type": "string" },
         "totalPrice": { "type": "number" },
         "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "paymentStatus": { "type": "string", "enum": ["unpaid", "paid"] },
+        "stripeSessionId": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["apartmentId", "guestName", "guestEmail", "startDate", "endDate", "totalPrice"]
+      "required": ["apartmentId", "guestName", "guestEmail", "startDate", "endDate", "totalPrice", "paymentStatus"]
     },
     "user": {
       "title": "User Profile",
@@ -44,12 +49,40 @@
         "role": { "type": "string", "enum": ["super_admin", "property_manager", "guest"] }
       },
       "required": ["uid", "email", "role"]
+    },
+    "review": {
+      "title": "Review",
+      "description": "User reviews for apartments.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "rating": { "type": "number", "minimum": 1, "maximum": 5 },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userName", "rating", "comment", "createdAt"]
+    },
+    "favorite": {
+      "title": "Favorite",
+      "description": "An apartment saved by a user to their favorites list",
+      "type": "object",
+      "properties": {
+        "apartmentId": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["apartmentId", "userId", "createdAt"]
     }
   },
   "firestore": {
     "apartments": {
       "schema": "apartment",
       "description": "Collection of apartments"
+    },
+    "apartments/{apartmentId}/reviews": {
+      "schema": "review",
+      "description": "Subcollection of reviews for a specific apartment"
     },
     "bookings": {
       "schema": "booking",
@@ -58,6 +91,10 @@
     "users": {
       "schema": "user",
       "description": "Collection of user profiles"
+    },
+    "users/{userId}/favorites": {
+      "schema": "favorite",
+      "description": "Subcollection of favorite apartments for a user"
     }
   }
 }

@@ -33,43 +33,62 @@ export default function AdminLogin({ id }: { id?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4"
+      className="flex min-h-screen items-stretch overflow-hidden bg-white"
     >
-      <div className="w-full max-w-md">
-        <div className="mb-12 text-center">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-600 text-white shadow-xl shadow-blue-200">
-            <LogIn className="h-10 w-10" />
+      {/* Left Side: Elegant Login Form */}
+      <div className="flex w-full flex-col justify-center px-8 lg:w-[45%] lg:px-24">
+        <div className="mb-16">
+          <div className="mb-12">
+            <span className="text-4xl italic font-serif leading-none tracking-tight">Inkindi</span>
+            <span className="premium-label !text-[8px] opacity-40 mt-1 block">Exclusive Residences</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900">Admin Portal</h1>
-          <p className="mt-3 text-neutral-600">Access your dashboard to manage apartments and bookings.</p>
+          <h1 className="text-4xl font-serif italic tracking-tight text-neutral-900 mb-4">Admin Access</h1>
+          <p className="text-neutral-500 font-light tracking-wide">Enter your credentials to manage the portfolio.</p>
         </div>
 
-        <div className="rounded-3xl bg-white p-10 shadow-xl ring-1 ring-neutral-200">
-          <div className="mb-8 rounded-2xl bg-blue-50/50 p-4 border border-blue-100">
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">Admin Credentials</p>
-            <div className="space-y-1 text-sm font-medium text-blue-900">
-              <p>Email: admin@inkindi.com</p>
-              <p>Pass: admin123</p>
+        <div className="space-y-8">
+          <div className="rounded-3xl bg-neutral-50 p-8 border border-neutral-100">
+             <div className="flex items-center gap-4 mb-6">
+                <div className="h-10 w-10 rounded-full bg-gold-100 flex items-center justify-center text-gold-600">
+                  <LogIn className="h-5 w-5" />
+                </div>
+                <div>
+                   <span className="premium-label !text-[10px] opacity-50 block">Security Protocol</span>
+                   <span className="text-xs font-bold uppercase tracking-widest text-neutral-900">Admin Credentials</span>
+                </div>
+             </div>
+            <div className="space-y-2 text-sm font-medium text-neutral-600">
+              <div className="flex justify-between">
+                <span className="opacity-50">Email</span>
+                <span className="font-mono text-xs">admin@inkindi.com</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="opacity-50">Auth Code</span>
+                <span className="font-mono text-xs">admin123</span>
+              </div>
             </div>
-            <p className="mt-2 text-[10px] text-blue-500 italic">Note: Use these to log in (ensure email/password is enabled in console).</p>
           </div>
 
           {error && (
-            <div className="mb-6 rounded-xl bg-red-50 p-4 text-sm font-medium text-red-600 border border-red-100">
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl bg-red-50 p-5 text-xs font-bold tracking-wider text-red-600 border border-red-100 uppercase"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-10">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-neutral-500 ml-1">Email Address</label>
+              <label className="premium-label !text-[10px] ml-1">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                <Mail className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                 <input 
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-2xl border border-neutral-200 bg-neutral-50 py-4 pl-12 pr-4 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  className="w-full border-b border-neutral-200 bg-transparent py-4 pl-8 pr-4 outline-none transition-all placeholder:text-neutral-300 focus:border-gold-600 text-sm tracking-wide"
                   placeholder="admin@inkindi.com"
                   required
                 />
@@ -77,14 +96,14 @@ export default function AdminLogin({ id }: { id?: string }) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-neutral-500 ml-1">Password</label>
+              <label className="premium-label !text-[10px] ml-1">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                <Lock className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                 <input 
                   type="password" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-neutral-200 bg-neutral-50 py-4 pl-12 pr-4 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  className="w-full border-b border-neutral-200 bg-transparent py-4 pl-8 pr-4 outline-none transition-all placeholder:text-neutral-300 focus:border-gold-600 text-sm tracking-wide"
                   placeholder="••••••••"
                   required
                 />
@@ -94,20 +113,36 @@ export default function AdminLogin({ id }: { id?: string }) {
             <button
               type="submit"
               disabled={loading}
-              className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-neutral-900 py-4 font-bold text-white transition-all hover:bg-neutral-800 disabled:opacity-50"
+              className="group flex w-full items-center justify-center gap-4 rounded-full bg-neutral-950 py-6 text-xs font-black uppercase tracking-[0.3em] text-white transition-all hover:bg-neutral-800 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : (
+              {loading ? 'Authenticating...' : (
                 <>
-                  Sign In
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  Enter Dashboard
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </button>
           </form>
-          
-          <p className="mt-8 text-center text-xs text-neutral-400">
-            Exclusive access for authorized Inkindi administrators only.
-          </p>
+        </div>
+
+        <p className="mt-16 text-center text-[10px] uppercase tracking-[0.2em] text-neutral-300 font-bold">
+          Inkindi Residences © {new Date().getFullYear()} — Secure Access Only
+        </p>
+      </div>
+
+      {/* Right Side: Showcase Image */}
+      <div className="relative hidden lg:block lg:flex-1 overflow-hidden">
+        <img 
+          src="https://images.unsplash.com/photo-1628592102751-ba83b0314276?auto=format&fit=crop&q=80&w=2000" 
+          alt="Luxury Residence" 
+          className="h-full w-full object-cover grayscale brightness-75 transition-transform duration-[10s] hover:scale-110"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-neutral-950/20" />
+        <div className="absolute bottom-20 left-20 right-20">
+          <div className="h-[1px] w-24 bg-gold-500 mb-8" />
+          <h2 className="text-6xl italic font-serif text-white tracking-tight leading-none mb-6">Redefining <br/> Hospitality.</h2>
+          <p className="text-white/60 text-lg font-light tracking-widest uppercase">The Inkindi Curated Collection</p>
         </div>
       </div>
     </motion.div>
